@@ -1,105 +1,221 @@
-# GraphQL vs REST - Um experimento controlado
-# 1. Desenho do Experimento
+# GraphQL vs REST - Um experimento controladoC
 
-## A. Hipóteses Nula e Alternativa
+# **Desenho do Experimento: Comparação REST vs. GraphQL**
 
-**Hipótese Nula (H₀):**
-Não há diferença significativa no tempo de resposta e no tamanho da resposta entre consultas realizadas por APIs REST e GraphQL.
+## **1. Objetivo**
 
-**Hipótese Alternativa (H₁):**
-Consultas realizadas por APIs GraphQL apresentam tempo de resposta menor e tamanho de resposta menor do que consultas realizadas por APIs REST.
+### **1.1 Objetivo Geral**
 
-## B. Variáveis Dependentes
+Determinar se a arquitetura **GraphQL** oferece uma redução significativa no **tempo de resposta** e no **tamanho da resposta** em comparação com a arquitetura **REST** para consultas simples e complexas na API do GitHub.
 
-* **Tempo de resposta da consulta** (medido em milissegundos)
-* **Tamanho da resposta** (medido em bytes)
+### **1.2 Objetivos Específicos**
 
-## C. Variáveis Independentes
+* Medir o tempo de resposta de consultas simples, específicas e complexas em REST e GraphQL.
+* Comparar o tamanho das respostas (payload) entre as duas abordagens.
+* Identificar qual tecnologia apresenta melhor performance em cenários reais de uso.
 
-* **Tipo de API utilizada:** REST vs GraphQL
+---
 
-## D. Tratamentos
+## **2. Hipóteses Estatísticas**
 
-* **Consulta via REST:** Executar consultas usando a API no formato REST.
-* **Consulta via GraphQL:** Executar as mesmas consultas, com os mesmos dados alvos, usando a API em formato GraphQL.
+* **Hipótese Nula (H0):**
+  Não há diferença significativa no tempo de resposta e no tamanho da resposta entre consultas realizadas por APIs REST e GraphQL.
+  **(H₀: μ_GraphQL = μ_REST)**
 
-## E. Objetos Experimentais
+* **Hipótese Alternativa (H1):**
+  Consultas realizadas por APIs GraphQL apresentam tempo de resposta menor e tamanho de resposta menor do que consultas realizadas por APIs REST.
+  **(H₁: μ_GraphQL < μ_REST)**
 
-* **API testada:** GitHub (API pública, disponível em versões REST e GraphQL)
-* **Usuário analisado:** Sindre Sorhus (`sindresorhus`)
-* **Repositório analisado:** `awesome` (`sindresorhus/awesome`)
+---
 
-## F. Tipo de Projeto Experimental
+## **3. Definição das Variáveis**
 
-**Experimento controlado do tipo “within-subjects”**
-Cada consulta será realizada nas duas APIs separadamente, medindo as mesmas variáveis, para comparação direta sob mesmas condições.
+### **3.1 Variável Independente (Fator)**
 
-## G. Quantidade de Medições
+* **Nome:** Tipo de API (X₁)
+* **Tipo:** Qualitativo
+* **Níveis/Tratamentos:**
 
-Para cada operação (consultar lista, consultar item, consultar issues), registrar:
+  * T1: REST
+  * T2: GraphQL
 
-* Tempo de resposta
-* Tamanho da resposta
+### **3.2 Variáveis Dependentes**
 
-Executadas tanto em REST quanto em GraphQL.
+* **Y₁:** Tempo de resposta da consulta (ms)
+* **Y₂:** Tamanho da resposta (bytes ou KB)
 
-## H. Ameaças à Validade
+---
 
-* Ambiente de execução não controlado (latência de Internet variável, servidores distintos)
-* Cache (resultados podem ser “cacheados”, afetando tempos medidos)
-* Carga no servidor (API pode estar sobrecarregada em algum momento do teste)
+## **4. Objetos Experimentais e Amostra de Consultas**
 
-## Justificativa de Escolha dos Objetos Experimentais
+### **4.1 Plataforma Escolhida**
 
-Para garantir **relevância, atualidade e representatividade**, selecionou-se o usuário **Sindre Sorhus** (`sindresorhus`), que possui o maior número de estrelas agregadas em seus repositórios dentre todos os desenvolvedores do GitHub, sendo amplamente reconhecido pela comunidade *open-source*.
+**API GitHub**: possui suporte a REST e GraphQL, permitindo comparações diretas.
 
-O repositório **“awesome”** (`sindresorhus/awesome`) foi escolhido para as consultas específicas e complexas. É um dos repositórios mais populares do mundo, famoso por listar diversos projetos e recursos considerados excelentes por área de tecnologia, com uma das maiores quantidades de estrelas da plataforma.
+### **4.2 Entidades de Teste**
 
-Essas entidades foram definidas para aproximar o experimento de **cenários reais de alta demanda**, promovendo resultados mais representativos pela quantidade de dados envolvidos.
+* **Usuário:** *sindresorhus*
+* **Repositório:** *sindresorhus/awesome*
 
-## Consultas Realizadas
+### **4.3 Amostra de Consultas**
 
-### **Consulta 1: Lista de Repositórios Populares**
+#### **Consulta Simples (C1)**
 
-**Objetivo:**
-Listar os dez repositórios públicos mais populares do usuário Sindre Sorhus, ordenados pelo número de estrelas.
+Listar os 10 repositórios mais populares dos 10 usuários mais populares (mais estrelas).
+**Dados coletados:** nome, estrelas, URL.
 
-**Métricas coletadas:**
+#### **Consulta Específica (C2)**
 
-* Nome do repositório (string)
-* Número de estrelas (inteiro)
-* URL do repositório (string)
+Obter detalhes dos repositórios.
+**Dados coletados:** nome, descrição, estrelas, forks, URL.
 
-### **Consulta 2: Detalhes do Repositório**
+#### **Consulta Complexa (C3)**
 
-**Objetivo:**
-Obter detalhes gerais do repositório “awesome”, incluindo nome, descrição, quantidade de estrelas, forks e URL.
+Listar as 10 últimas issues dos repositórios.
+**Dados coletados:** número, título, criação, status, autor.
 
-**Métricas coletadas:**
+---
 
-* Nome do repositório (string)
-* Descrição (texto)
-* Número de estrelas (inteiro)
-* Número de forks (inteiro)
-* URL do repositório (string)
+## **5. Desenho Experimental e Amostragem**
 
-### **Consulta 3: Issues Recentes**
+### **5.1 Tipo de Projeto Experimental**
 
-**Objetivo:**
-Listar as dez últimas issues criadas no repositório “awesome”, obtendo informações como número, título, data de criação, estado e autor de cada issue.
+**Within-Subjects (Medidas Repetidas)**
+Cada consulta é feita com ambos os tratamentos.
 
-**Métricas coletadas:**
+### **5.2 Tamanho da Amostra e Randomização**
 
-* Nome do repositório (string)
-* Número da issue (inteiro)
-* Título da issue (string)
-* Estado (aberta/fechada)
-* Data de criação (timestamp ISO)
-* Nome de usuário do autor (string)
+* **Repetições por tratamento (n):** 33
+* **Total de medições:**
+  `3 consultas × 2 tratamentos × 33 repetições = 198 medições`
+* **Randomização:**
+  Ordem das 6 combinações (C1-T1, C1-T2, ..., C3-T2) será aleatória em cada bloco.
 
-## Cuidados Tomados para Execução Posterior
+---
 
-* Configurar ambiente local: rodar sempre do mesmo computador, preferencialmente na mesma rede, para reduzir variáveis.
-* Definir horário dos testes: realizar os testes em horários próximos para minimizar variações de carga.
-* Manter constantes os parâmetros das queries (número de itens, campos requisitados, etc).
-* Salvar todas as respostas e métricas em arquivo `.csv`.
+## **6. Ameaças à Validade e Mitigação**
+
+| Ameaça               | Descrição                 | Estratégia de Mitigação               |
+| -------------------- | ------------------------- | ------------------------------------- |
+| Latência de Internet | Variações de rede         | Mesma máquina e rede; testes próximos |
+| Cache                | Cache distorce tempos     | Headers anti-cache; mais réplicas     |
+| Carga no Servidor    | Sobrecarga momentânea     | Horários próximos; monitorar erros    |
+| Variação de Código   | Implementações diferentes | Mesmos scripts e ambiente             |
+| Efeito de Ordem      | Ordem fixa gera viés      | Randomização completa                 |
+| Rate Limit           | Limite da API             | Delays e monitoramento dos headers    |
+
+---
+
+## **7. Procedimento e Cuidados**
+
+### **7.1 Configuração do Cenário**
+
+* Mesmo computador e rede
+* Execução contínua
+* Mesmos parâmetros entre REST e GraphQL
+
+### **7.2 Controle de Rate Limiting**
+
+* Delay entre 1 e 3 segundos
+* Monitorar headers de limite
+
+### **7.3 Execução Randomizada e Registro**
+
+* Gerar sequência aleatória das 198 execuções
+* Para cada execução:
+
+  * Registrar **id_execucao**, **consulta**, **tipo_api**
+  * Registrar variáveis dependentes (**Y1** e **Y2**)
+  * Registrar **observacoes**
+
+**Formato CSV esperado:**
+
+| Coluna              | Descrição       |
+| ------------------- | --------------- |
+| id_execucao         | ID único        |
+| consulta            | C1, C2 ou C3    |
+| tipo_api            | REST ou GraphQL |
+| tempo_resposta_ms   | Y1              |
+| tamanho_resposta_kb | Y2              |
+| observacoes         | anomalias       |
+
+---
+
+## **8. Análise de Dados e Critérios Estatísticos**
+
+### **8.1 Estatísticas Descritivas**
+
+Para cada uma das 6 combinações e cada variável dependente:
+
+* Média, mediana, moda
+* Desvio padrão, variância, amplitude
+* Quartis, mínimo, máximo
+* Outliers (IQR)
+
+---
+
+### **8.2 Teste de Normalidade (Shapiro-Wilk)**
+
+Aplicado sobre a diferença **D = YREST − YGraphQL**.
+
+* **H₀:** D é normal
+* **H₁:** D não é normal
+* **α = 0,05**
+
+**Decisão:**
+
+* p > 0,05 → usar **t pareado**
+* p ≤ 0,05 → usar **Wilcoxon**
+
+---
+
+### **8.3 Teste Principal (se normal): Teste t Pareado**
+
+* **α = 0,05**
+
+| Variável     | H₀               | H₁               |
+| ------------ | ---------------- | ---------------- |
+| Y₁ (tempo)   | μREST = μGraphQL | μREST > μGraphQL |
+| Y₂ (tamanho) | μREST = μGraphQL | μREST > μGraphQL |
+
+**Critério:**
+
+* p ≤ 0,05 → rejeita H₀ (GraphQL superior)
+* p > 0,05 → não rejeita H₀
+
+---
+
+### **8.4 Teste Alternativo (se não-normal): Wilcoxon**
+
+| Variável | H₀             | H₁             |
+| -------- | -------------- | -------------- |
+| Y₁       | mediana(D) = 0 | mediana(D) > 0 |
+| Y₂       | mediana(D) = 0 | mediana(D) > 0 |
+
+---
+
+### **8.5 Tamanho de Efeito e IC**
+
+* **d de Cohen:**
+  `d = (μREST - μGraphQL) / σ_diferença`
+
+Classificação:
+
+* < 0,2 → pequeno
+* 0,2–0,5 → médio
+* 0,5–0,8 → grande
+* ≥ 0,8 → muito grande
+
+**Intervalo de Confiança (95%)** para (μREST – μGraphQL).
+Se não contiver zero → diferença significativa.
+
+---
+
+### **8.6 Análise Complementar**
+
+Correlação entre Y1 e Y2:
+
+* Pearson (normal)
+* Spearman (não-normal)
+
+<img width="333" height="568" alt="Captura de Tela 2025-11-13 às 23 42 53" src="https://github.com/user-attachments/assets/cf95f78f-f607-48de-b3dd-284ea1044941" />
