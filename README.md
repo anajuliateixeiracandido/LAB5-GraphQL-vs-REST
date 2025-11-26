@@ -1,12 +1,10 @@
-# GraphQL vs REST - Um experimento controladoC
-
 # **Desenho do Experimento: Comparação REST vs. GraphQL**
 
 ## **1. Objetivo**
 
 ### **1.1 Objetivo Geral**
 
-Determinar se a arquitetura **GraphQL** oferece uma redução significativa no **tempo de resposta** e no **tamanho da resposta** em comparação com a arquitetura **REST** para consultas simples e complexas na API do GitHub.
+Determinar se a arquitetura **GraphQL** oferece uma redução significativa no **tempo de resposta** e no **tamanho da resposta** em comparação com a arquitetura **REST** para consultas de dados complexas e simples na API do GitHub.
 
 ### **1.2 Objetivos Específicos**
 
@@ -18,13 +16,11 @@ Determinar se a arquitetura **GraphQL** oferece uma redução significativa no *
 
 ## **2. Hipóteses Estatísticas**
 
-* **Hipótese Nula (H0):**
-  Não há diferença significativa no tempo de resposta e no tamanho da resposta entre consultas realizadas por APIs REST e GraphQL.
-  **(H₀: μ_GraphQL = μ_REST)**
+* **Hipótese Nula (H0):** Não há diferença significativa no tempo e tamanho da resposta entre REST e GraphQL.
+  **H₀: μ_GraphQL = μ_REST**
 
-* **Hipótese Alternativa (H1):**
-  Consultas realizadas por APIs GraphQL apresentam tempo de resposta menor e tamanho de resposta menor do que consultas realizadas por APIs REST.
-  **(H₁: μ_GraphQL < μ_REST)**
+* **Hipótese Alternativa (H1):** GraphQL apresenta menor tempo e menor tamanho de resposta.
+  **H₁: μ_GraphQL < μ_REST**
 
 ---
 
@@ -36,13 +32,13 @@ Determinar se a arquitetura **GraphQL** oferece uma redução significativa no *
 * **Tipo:** Qualitativo
 * **Níveis/Tratamentos:**
 
-  * T1: REST
-  * T2: GraphQL
+  * **T1:** REST
+  * **T2:** GraphQL
 
-### **3.2 Variáveis Dependentes**
+### **3.2 Variáveis Dependentes (Respostas)**
 
-* **Y₁:** Tempo de resposta da consulta (ms)
-* **Y₂:** Tamanho da resposta (bytes ou KB)
+* **Y1:** Tempo de resposta (ms)
+* **Y2:** Tamanho da resposta (bytes ou KB)
 
 ---
 
@@ -50,29 +46,26 @@ Determinar se a arquitetura **GraphQL** oferece uma redução significativa no *
 
 ### **4.1 Plataforma Escolhida**
 
-**API GitHub**: possui suporte a REST e GraphQL, permitindo comparações diretas.
+* **API GitHub**, devido ao suporte a REST e GraphQL sobre o mesmo domínio de dados.
 
 ### **4.2 Entidades de Teste**
 
-* **Usuário:** *sindresorhus*
-* **Repositório:** *sindresorhus/awesome*
+* **Usuários:** 10 usuários mais populares (critério: seguidores ou estrelas).
+* **Repositórios:** Para cada usuário, os 10 repositórios públicos mais populares.
 
 ### **4.3 Amostra de Consultas**
 
-#### **Consulta Simples (C1)**
+* **Consulta Simples (C1):** Listar os 10 repositórios mais populares de cada usuário.
 
-Listar os 10 repositórios mais populares dos 10 usuários mais populares (mais estrelas).
-**Dados coletados:** nome, estrelas, URL.
+  * Coleta: nome, estrelas, URL.
 
-#### **Consulta Específica (C2)**
+* **Consulta de Item Específico (C2):** Obter detalhes do repositório mais popular.
 
-Obter detalhes dos repositórios.
-**Dados coletados:** nome, descrição, estrelas, forks, URL.
+  * Coleta: nome, descrição, estrelas, forks, URL.
 
-#### **Consulta Complexa (C3)**
+* **Consulta Complexa/Aninhada (C3):** Listar as 10 últimas issues do repositório mais popular.
 
-Listar as 10 últimas issues dos repositórios.
-**Dados coletados:** número, título, criação, status, autor.
+  * Coleta: número da issue, título, criação, estado, autor.
 
 ---
 
@@ -80,64 +73,57 @@ Listar as 10 últimas issues dos repositórios.
 
 ### **5.1 Tipo de Projeto Experimental**
 
-**Within-Subjects (Medidas Repetidas)**
-Cada consulta é feita com ambos os tratamentos.
+* **Desenho:** *Within-Subjects* (Medidas Repetidas).
+* **Justificativa:** Cada consulta é executada em REST e GraphQL, reduzindo variabilidade externa.
 
 ### **5.2 Tamanho da Amostra e Randomização**
 
-* **Repetições por tratamento (n):** 33
-* **Total de medições:**
-  `3 consultas × 2 tratamentos × 33 repetições = 198 medições`
-* **Randomização:**
-  Ordem das 6 combinações (C1-T1, C1-T2, ..., C3-T2) será aleatória em cada bloco.
+* **Repetições por Tratamento:** 33
+* **Total de Medições:** 3 consultas × 2 tratamentos × 33 repetições = **198**
+* **Randomização:** Ordem aleatória das 6 combinações (C1-T1, C1-T2, ..., C3-T2).
 
 ---
 
 ## **6. Ameaças à Validade e Mitigação**
 
-| Ameaça               | Descrição                 | Estratégia de Mitigação               |
-| -------------------- | ------------------------- | ------------------------------------- |
-| Latência de Internet | Variações de rede         | Mesma máquina e rede; testes próximos |
-| Cache                | Cache distorce tempos     | Headers anti-cache; mais réplicas     |
-| Carga no Servidor    | Sobrecarga momentânea     | Horários próximos; monitorar erros    |
-| Variação de Código   | Implementações diferentes | Mesmos scripts e ambiente             |
-| Efeito de Ordem      | Ordem fixa gera viés      | Randomização completa                 |
-| Rate Limit           | Limite da API             | Delays e monitoramento dos headers    |
+| Ameaça               | Tipo    | Descrição                                   | Mitigação                                       |
+| -------------------- | ------- | ------------------------------------------- | ----------------------------------------------- |
+| Latência de Internet | Externa | Variação de rede altera tempo               | Mesmo computador/rede; horários próximos        |
+| Cache de Resposta    | Externa | Pode distorcer tempos                       | Headers anti-cache; aumentar réplicas           |
+| Carga no Servidor    | Externa | GitHub pode estar sobrecarregado            | Realizar em horários próximos; monitorar status |
+| Variação de Código   | Interna | Implementações distintas influenciam tempos | Usar o mesmo script e ambiente                  |
+| Efeito de Ordem      | Interna | Execuções em ordem fixa causam viés         | Randomização completa                           |
+| Rate limiting        | Externa | API limita número de requisições            | Delays e monitoramento de cabeçalhos            |
 
 ---
 
-## **7. Procedimento e Cuidados**
+## **7. Procedimento e Cuidados na Execução**
 
 ### **7.1 Configuração do Cenário**
 
-* Mesmo computador e rede
-* Execução contínua
-* Mesmos parâmetros entre REST e GraphQL
+* Usar o mesmo equipamento e rede.
+* Realizar o experimento em intervalo contínuo.
+* Manter constantes os parâmetros das queries.
 
 ### **7.2 Controle de Rate Limiting**
 
-* Delay entre 1 e 3 segundos
-* Monitorar headers de limite
+* Inserir delay de **1 a 3 segundos** entre requisições.
+* Monitorar headers de limite da API.
 
 ### **7.3 Execução Randomizada e Registro**
 
-* Gerar sequência aleatória das 198 execuções
-* Para cada execução:
+Para cada execução:
 
-  * Registrar **id_execucao**, **consulta**, **tipo_api**
-  * Registrar variáveis dependentes (**Y1** e **Y2**)
-  * Registrar **observacoes**
+* Registrar:
 
-**Formato CSV esperado:**
+  * `id_execucao`
+  * `consulta (C1, C2, C3)`
+  * `tipo_api (REST/GraphQL)`
+  * `tempo_resposta_ms`
+  * `tamanho_resposta_kb`
+  * `observacoes`
 
-| Coluna              | Descrição       |
-| ------------------- | --------------- |
-| id_execucao         | ID único        |
-| consulta            | C1, C2 ou C3    |
-| tipo_api            | REST ou GraphQL |
-| tempo_resposta_ms   | Y1              |
-| tamanho_resposta_kb | Y2              |
-| observacoes         | anomalias       |
+Todos os dados serão gravados em **CSV**.
 
 ---
 
@@ -145,77 +131,53 @@ Cada consulta é feita com ambos os tratamentos.
 
 ### **8.1 Estatísticas Descritivas**
 
-Para cada uma das 6 combinações e cada variável dependente:
+Para cada combinação:
 
 * Média, mediana, moda
-* Desvio padrão, variância, amplitude
-* Quartis, mínimo, máximo
-* Outliers (IQR)
+* Desvio padrão, variância, amplitude, IQR, coeficiente de variação
+* Quartis e identificação de outliers (IQR)
 
----
+### **8.2 Teste de Normalidade**
 
-### **8.2 Teste de Normalidade (Shapiro-Wilk)**
+* **Método:** Shapiro-Wilk
+* **Aplicado sobre a diferença:** *D = YREST − YGraphQL*
+* **Decisão (α = 0,05):**
 
-Aplicado sobre a diferença **D = YREST − YGraphQL**.
+  * p > 0,05 → usar **Teste t pareado**
+  * p ≤ 0,05 → usar **Wilcoxon**
 
-* **H₀:** D é normal
-* **H₁:** D não é normal
-* **α = 0,05**
+### **8.3 Teste Principal se Normalidade for atendida**
 
-**Decisão:**
+* **Teste:** t pareado
+* **Hipóteses (Y1 e Y2):**
 
-* p > 0,05 → usar **t pareado**
-* p ≤ 0,05 → usar **Wilcoxon**
+  * H₀: μREST = μGraphQL
+  * H₁: μREST > μGraphQL
 
----
+### **8.4 Teste Alternativo se Normalidade não for atendida**
 
-### **8.3 Teste Principal (se normal): Teste t Pareado**
+* **Teste:** Wilcoxon
+* **Hipóteses:**
 
-* **α = 0,05**
+  * H₀: mediana(diferença) = 0
+  * H₁: mediana(diferença) > 0
 
-| Variável     | H₀               | H₁               |
-| ------------ | ---------------- | ---------------- |
-| Y₁ (tempo)   | μREST = μGraphQL | μREST > μGraphQL |
-| Y₂ (tamanho) | μREST = μGraphQL | μREST > μGraphQL |
-
-**Critério:**
-
-* p ≤ 0,05 → rejeita H₀ (GraphQL superior)
-* p > 0,05 → não rejeita H₀
-
----
-
-### **8.4 Teste Alternativo (se não-normal): Wilcoxon**
-
-| Variável | H₀             | H₁             |
-| -------- | -------------- | -------------- |
-| Y₁       | mediana(D) = 0 | mediana(D) > 0 |
-| Y₂       | mediana(D) = 0 | mediana(D) > 0 |
-
----
-
-### **8.5 Tamanho de Efeito e IC**
+### **8.5 Tamanho do Efeito e Intervalo de Confiança**
 
 * **d de Cohen:**
-  `d = (μREST - μGraphQL) / σ_diferença`
 
-Classificação:
+  * <0,2: pequeno
+  * 0,2–0,5: médio
+  * 0,5–0,8: grande
+  * ≥0,8: muito grande
 
-* < 0,2 → pequeno
-* 0,2–0,5 → médio
-* 0,5–0,8 → grande
-* ≥ 0,8 → muito grande
+* **IC 95% para a diferença:**
 
-**Intervalo de Confiança (95%)** para (μREST – μGraphQL).
-Se não contiver zero → diferença significativa.
-
----
+  * Se não contém 0 → diferença significativa.
 
 ### **8.6 Análise Complementar**
 
-Correlação entre Y1 e Y2:
+* **Correlação entre Y1 e Y2:**
 
-* Pearson (normal)
-* Spearman (não-normal)
-
-<img width="333" height="568" alt="Captura de Tela 2025-11-13 às 23 42 53" src="https://github.com/user-attachments/assets/cf95f78f-f607-48de-b3dd-284ea1044941" />
+  * Pearson (normal)
+  * Spearman (não-normal)
