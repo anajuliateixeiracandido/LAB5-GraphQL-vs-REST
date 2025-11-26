@@ -50,7 +50,7 @@ Determinar se a arquitetura **GraphQL** oferece uma redução significativa no *
 
 ### **4.2 Entidades de Teste**
 
-* **Usuários:** 10 usuários mais populares (critério: seguidores ou estrelas).
+* **Usuários:** 10 desenvolvedores trending do GitHub em 25/11/2025 (fonte: https://github.com/trending/developers).
 * **Repositórios:** Para cada usuário, os 10 repositórios públicos mais populares.
 
 ### **4.3 Amostra de Consultas**
