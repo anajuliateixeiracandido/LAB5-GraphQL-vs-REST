@@ -249,24 +249,75 @@ onde σ_pooled = √[(σ²_REST × (n_REST - 1) + σ²_GraphQL × (n_GraphQL - 1
 - Se o IC **não contiver zero**: a diferença é estatisticamente significativa ao nível de 5%
 - Se o IC **contiver zero**: não há diferença significativa
 
-### 8.5 Análise Complementar
+### 8.5 Tamanho do Efeito
 
-**Correlação entre Tempo (Y₁) e Tamanho (Y₂):**
+**Medida:** d de Cohen (para amostras independentes)
 
-- **Teste de Pearson (r):** Se os dados forem normais
-  - H₀: ρ = 0 (não há correlação linear)
-  - H₁: ρ ≠ 0 (há correlação linear)
-  
-- **Teste de Spearman (ρ):** Se os dados forem não-normais
-  - H₀: ρ_s = 0 (não há correlação monotônica)
-  - H₁: ρ_s ≠ 0 (há correlação monotônica)
+**Interpretação:**
+- |d| < 0,2: efeito pequeno
+- 0,2 ≤ |d| < 0,5: efeito médio
+- 0,5 ≤ |d| < 0,8: efeito grande
+- |d| ≥ 0,8: efeito muito grande
 
-**Interpretação da Correlação:**
+### 8.6 Análise de Correlação
+
+**Objetivo:** Investigar a relação entre tempo de resposta (Y₁) e tamanho de resposta (Y₂) dentro de cada API.
+
+**Método:**
+1. **Teste de Normalidade:** Shapiro-Wilk aplicado a ambas variáveis (tempo e tamanho)
+2. **Escolha do Teste de Correlação:**
+   - **Pearson (r):** Se ambas variáveis forem normais
+     - H₀: ρ = 0 (não há correlação linear)
+     - H₁: ρ ≠ 0 (há correlação linear)
+   - **Spearman (ρ):** Se pelo menos uma variável for não-normal
+     - H₀: ρ_s = 0 (não há correlação monotônica)
+     - H₁: ρ_s ≠ 0 (há correlação monotônica)
+
+**Interpretação:**
 - |r| < 0,3: correlação fraca
 - 0,3 ≤ |r| < 0,7: correlação moderada
 - |r| ≥ 0,7: correlação forte
+- p-valor < 0,05: correlação estatisticamente significativa
+
+**Aplicação:** Análise realizada separadamente para:
+- REST: C1, C2, C3
+- GraphQL: C1, C2, C3
+
+### 8.7 Justificativa do Design Between-Subjects
+
+**Por que Between-Subjects e não Within-Subjects?**
+
+Este experimento utiliza **design Between-Subjects (inter-sujeitos)** com **grupos independentes**, pelos seguintes motivos:
+
+1. **Natureza da Coleta de Dados:**
+   - Cada medição REST é **independente** de cada medição GraphQL
+   - As 990 requisições REST e 990 GraphQL foram executadas com **randomização independente**
+   - **Não há pareamento** entre requisições (ex: a 1ª REST não corresponde à 1ª GraphQL)
+   - Cada API foi testada em **momentos diferentes** com **condições de rede variáveis**
+
+2. **Impossibilidade de Pareamento:**
+   - Para usar Within-Subjects seria necessário:
+     - Executar REST e GraphQL para o **mesmo usuário** na **mesma execução**
+     - Parear cada medição REST com sua correspondente GraphQL
+     - Controlar rigorosamente as condições (horário, cache, conexão)
+   - **Nossos dados NÃO possuem esse pareamento**
+
+3. **Teste Estatístico Correto:**
+   - **Mann-Whitney U** é apropriado para **amostras independentes** (Between-Subjects)
+   - **Wilcoxon Signed-Rank** seria usado para **amostras pareadas** (Within-Subjects)
+   - Usar Wilcoxon em dados não-pareados geraria **resultados inválidos**
+
+4. **Vantagens do Design Atual:**
+   - Representa uso **realista** das APIs (requisições independentes)
+   - Evita efeitos de **ordem** (carry-over) e **aprendizado**
+   - Cada API testada em **condições naturais** de operação
+   - Grande volume de dados (N=824 por grupo) compensa variabilidade
+
+**Conclusão:** O design Between-Subjects com Mann-Whitney U é **metodologicamente correto** para os dados coletados. Alterar para Within-Subjects exigiria **nova coleta de dados** com pareamento explícito.
 
 ---
+
+### 8.5 Análise Complementar
 
 ## 9. Estrutura do Projeto
 
@@ -338,14 +389,40 @@ python analise_estatistica.py
 
 ---
 
-## 11. Validação dos Dados
+## 11. Validacao dos Dados e Alertas Metodologicos
 
-Antes da análise estatística, o script `analise_estatistica.py` executa validações automáticas:
+Antes da analise estatistica, o script `analise_estatistica.py` executa validacoes automaticas e gera alertas metodologicos:
 
-1. **Verificação de valores fixos/constantes** (possível cache)
-2. **Verificação de comparação justa** (tamanhos similares entre REST e GraphQL?)
-3. **Verificação de taxa de sucesso** (% de requisições com status 200)
-4. **Alertas para Cohen's d extremo** (> 3 indica possível problema)
+### 11.1 Validacoes Executadas
+
+1. **Verificacao de valores fixos/constantes** (possivel cache)
+   - Calcula Coeficiente de Variacao (CV) dos tamanhos de resposta
+   - CV < 5% pode indicar dados muito constantes
+
+2. **Verificacao de comparacao justa** (tamanhos similares entre REST e GraphQL?)
+   - Compara medias de tamanho entre APIs
+   - Razoes > 5x podem indicar consultas fundamentalmente diferentes
+
+3. **Verificacao de taxa de sucesso** (% de requisicoes com status 200)
+   - Taxa < 90% indica problemas com rate limiting ou tokens
+   - Importante: taxas iguais entre APIs garantem comparacao justa
+
+4. **Alertas para Cohen's d extremo** (|d| > 3)
+   - Valores extremos sao raros e podem indicar diferencas massivas
+   - **Importante:** NAO significa erro, apenas que as diferencas sao muito grandes
+
+### 11.2 Interpretacao dos Alertas
+
+**Os alertas NAO sao erros de codigo**, mas sim **indicadores metodologicos** que ajudam a interpretar os resultados:
+
+| Alerta | O que Significa | E Problema? | Pode Corrigir? |
+|--------|----------------|-------------|----------------|
+| CV baixo (3.3%) | Dados muito constantes | NAO - esperado para APIs estaveis | NAO necessario |
+| Taxa sucesso 83.2% | 166 requisicoes falharam | MODERADO - reduz amostra | SIM - mais tokens |
+| Cohen's d > 3 (tamanho) | Diferencas massivas entre APIs | NAO - objetivo do GraphQL | NAO - e legitimo |
+| Cohen's d > 3 (tempo) | GraphQL muito mais lento | ATENCAO - contraintuitivo | Investigacao adicional |
+
+**Conclusao:** Os alertas servem para **documentar caracteristicas dos dados**, nao indicam falhas na implementacao. O script esta funcionando corretamente ao identifica-los.
 
 ---
 

@@ -1,0 +1,116 @@
+================================================================================
+RELATÓRIO COMPLETO: REST vs GraphQL
+Analise Estatistica Corrigida e Validada
+================================================================================
+Data da analise: 2025-11-28 09:17:36
+
+ALERTAS DE QUALIDADE DOS DADOS
+--------------------------------------------------------------------------------
+1. ATENCAO: GraphQL C1 tem variacao muito baixa (CV=3.3%)
+2. ATENCAO: REST tem taxa de sucesso baixa (83.2%)
+3. ATENCAO: GraphQL tem taxa de sucesso baixa (83.2%)
+4. Cohen's d extremo em C1 tempo_resposta_ms: -3.99
+5. Cohen's d extremo em C1 tamanho_resposta_kb: 23.46
+
+ATENÇÃO: Estes alertas indicam possiveis problemas que devem ser
+considerados ao interpretar os resultados!
+
+RESUMO EXECUTIVO
+--------------------------------------------------------------------------------
+
+Tempo de Resposta: 0/3 consultas com diferenca significativa
+Tamanho da Resposta: 2/3 consultas com diferenca significativa
+
+
+CONSULTA C1
+--------------------------------------------------------------------------------
+
+Tempo de Resposta (ms):
+  Media REST: 602.30 (271 valores unicos)
+  Media GraphQL: 1554.92 (271 valores unicos)
+  Diferenca: -952.61
+  Teste: Mann-Whitney U
+  p-valor: 1.0000
+  Significativo: NÃO
+  Cohen's d: -3.9873 (EXTREMAMENTE GRANDE (SUSPEITO!))
+  IC 95%: [-992.94, -912.29]
+  ALERTA: Cohen's d extremo - possivel comparacao injusta!
+
+Tamanho da Resposta (KB):
+  Media REST: 52.92 (10 valores unicos)
+  Media GraphQL: 7.94 (10 valores unicos)
+  Diferenca: 44.97
+  Teste: Mann-Whitney U
+  p-valor: 0.0000
+  Significativo: SIM
+  Cohen's d: 23.4586 (EXTREMAMENTE GRANDE (SUSPEITO!))
+  IC 95%: [44.65, 45.29]
+  ALERTA: Cohen's d extremo - possivel comparacao injusta!
+
+CONSULTA C2
+--------------------------------------------------------------------------------
+
+Tempo de Resposta (ms):
+  Media REST: 590.91 (276 valores unicos)
+  Media GraphQL: 728.80 (273 valores unicos)
+  Diferenca: -137.90
+  Teste: Mann-Whitney U
+  p-valor: 1.0000
+  Significativo: NÃO
+  Cohen's d: -0.6031 (GRANDE)
+  IC 95%: [-176.37, -99.43]
+
+Tamanho da Resposta (KB):
+  Media REST: 9.03 (10 valores unicos)
+  Media GraphQL: 1.03 (7 valores unicos)
+  Diferenca: 8.00
+  Teste: Mann-Whitney U
+  p-valor: 0.0000
+  Significativo: SIM
+  Cohen's d: 2.0224 (MUITO GRANDE)
+  IC 95%: [7.34, 8.66]
+
+CONSULTA C3
+--------------------------------------------------------------------------------
+
+Tempo de Resposta (ms):
+  Media REST: 602.55 (273 valores unicos)
+  Media GraphQL: 686.94 (280 valores unicos)
+  Diferenca: -84.39
+  Teste: Mann-Whitney U
+  p-valor: 1.0000
+  Significativo: NÃO
+  Cohen's d: -0.4286 (MÉDIO)
+  IC 95%: [-117.05, -51.74]
+
+Tamanho da Resposta (KB):
+  Media REST: 14.06 (7 valores unicos)
+  Media GraphQL: 12.10 (8 valores unicos)
+  Diferenca: 1.95
+  Teste: Mann-Whitney U
+  p-valor: 0.9858
+  Significativo: NÃO
+  Cohen's d: 0.1345 (PEQUENO)
+  IC 95%: [-0.47, 4.38]
+
+
+LIMITAÇÕES DO ESTUDO
+--------------------------------------------------------------------------------
+
+Este estudo possui as seguintes limitacoes que devem ser consideradas:
+
+3. CONDIÇÕES DE REDE:
+   Testes realizados em ambiente especifico. Resultados podem variar
+   com diferentes condicoes de rede, carga do servidor, etc.
+
+
+CONCLUSÕES
+--------------------------------------------------------------------------------
+
+GraphQL apresenta vantagem SIGNIFICATIVA no tamanho das respostas.
+
+PORÉM, devido aos alertas de qualidade de dados identificados,
+recomenda-se cautela ao interpretar estas conclusoes.
+
+
+================================================================================

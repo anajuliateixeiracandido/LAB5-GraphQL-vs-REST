@@ -1,31 +1,17 @@
 """
-Análise Estatística CORRIGIDA: REST vs GraphQL
-================================================
-
-CORREÇÕES APLICADAS:
-1. Validação de Cohen's d extremo (alerta se > 3)
-2. Detecção de valores fixos/constantes (possível cache)
-3. Verificação de comparação justa (tamanhos similares?)
-4. Relatório honesto sobre limitações
-5. Análise de qualidade dos dados
-
+Analise Estatistica: REST vs GraphQL
 """
 
 import pandas as pd
 import numpy as np
 from scipy import stats
 from scipy.stats import shapiro, mannwhitneyu, pearsonr, spearmanr, ttest_ind
-import matplotlib.pyplot as plt
-import seaborn as sns
 from datetime import datetime
 from collections import Counter
 import warnings
 warnings.filterwarnings('ignore')
 
-plt.style.use('seaborn-v0_8-darkgrid')
-sns.set_palette("husl")
-
-class AnalisadorRESTvsGraphQLCorrigido:
+class AnalisadorRESTvsGraphQL:
     
     def __init__(self, arquivo_rest, arquivo_graphql):
         self.df_rest = pd.read_csv(arquivo_rest)
@@ -36,12 +22,12 @@ class AnalisadorRESTvsGraphQLCorrigido:
         
     def validar_qualidade_dados(self):
         print("=" * 80)
-        print("🔍 VALIDAÇÃO DE QUALIDADE DOS DADOS")
+        print(" VALIDAÇÃO DE QUALIDADE DOS DADOS")
         print("=" * 80)
         
         alertas_encontrados = []
         
-        print("\n1. Verificando variação nos tamanhos de resposta...")
+        print("\n1. Verificando variacao nos tamanhos de resposta...")
         for tipo_api in ['REST', 'GraphQL']:
             df_api = self.df_rest if tipo_api == 'REST' else self.df_graphql
             df_api_200 = df_api[df_api['status_code'] == 200]
@@ -55,22 +41,22 @@ class AnalisadorRESTvsGraphQLCorrigido:
                     media = dados.mean()
                     cv = (desvio_padrao / media * 100) if media > 0 else 0
                     
-                    print(f"   {tipo_api} {consulta}: {valores_unicos} valores únicos, CV={cv:.2f}%")
+                    print(f"   {tipo_api} {consulta}: {valores_unicos} valores unicos, CV={cv:.2f}%")
                     
                     # ALERTA: Todos os valores iguais
                     if valores_unicos == 1:
-                        alerta = f"⚠️  CRÍTICO: {tipo_api} {consulta} tem TODOS os tamanhos idênticos ({media:.2f} KB)"
+                        alerta = f"ATENCAO: {tipo_api} {consulta} tem TODOS os tamanhos identicos ({media:.2f} KB)"
                         alertas_encontrados.append(alerta)
                         print(f"      {alerta}")
                     
-                    # ALERTA: Muito pouca variação
+                    # ALERTA: Muito pouca variacao
                     elif cv < 5 and media > 1:
-                        alerta = f"⚠️  ATENÇÃO: {tipo_api} {consulta} tem variação muito baixa (CV={cv:.1f}%)"
+                        alerta = f"ATENCAO: {tipo_api} {consulta} tem variacao muito baixa (CV={cv:.1f}%)"
                         alertas_encontrados.append(alerta)
                         print(f"      {alerta}")
         
-        # 2. Verificar se REST e GraphQL têm tamanhos similares (comparação justa?)
-        print("\n2. Verificando comparação justa (tamanhos similares?)...")
+        # 2. Verificar se REST e GraphQL tem tamanhos similares (comparacao justa?)
+        print("\n2. Verificando comparacao justa (tamanhos similares?)...")
         for consulta in ['C1', 'C2', 'C3']:
             rest_dados = self.df_rest[(self.df_rest['consulta'] == consulta) & 
                                       (self.df_rest['status_code'] == 200)]['tamanho_resposta_kb']
@@ -82,10 +68,10 @@ class AnalisadorRESTvsGraphQLCorrigido:
                 media_graphql = graphql_dados.mean()
                 razao = media_rest / media_graphql if media_graphql > 0 else float('inf')
                 
-                print(f"   {consulta}: REST={media_rest:.2f}KB vs GraphQL={media_graphql:.2f}KB (razão={razao:.1f}x)")
+                print(f"   {consulta}: REST={media_rest:.2f}KB vs GraphQL={media_graphql:.2f}KB (razao={razao:.1f}x)")
                 
                 if razao > 10 or razao < 0.1:
-                    alerta = f"⚠️  CRÍTICO: {consulta} tem diferença de {razao:.1f}x - REST e GraphQL podem estar retornando DADOS DIFERENTES!"
+                    alerta = f"ATENCAO: {consulta} tem diferenca de {razao:.1f}x - REST e GraphQL podem estar retornando DADOS DIFERENTES!"
                     alertas_encontrados.append(alerta)
                     print(f"      {alerta}")
         
@@ -100,17 +86,17 @@ class AnalisadorRESTvsGraphQLCorrigido:
             print(f"   {tipo_api}: {sucesso}/{total} ({taxa:.1f}%)")
             
             if taxa < 90:
-                alerta = f"⚠️  ATENÇÃO: {tipo_api} tem taxa de sucesso baixa ({taxa:.1f}%)"
+                alerta = f"ATENCAO: {tipo_api} tem taxa de sucesso baixa ({taxa:.1f}%)"
                 alertas_encontrados.append(alerta)
                 print(f"      {alerta}")
         
         self.alertas = alertas_encontrados
         
         if alertas_encontrados:
-            print(f"\n⚠️  TOTAL DE ALERTAS: {len(alertas_encontrados)}")
-            print("   Estes problemas serão incluídos no relatório final.")
+            print(f"\nTOTAL DE ALERTAS: {len(alertas_encontrados)}")
+            print("   Estes problemas serao incluidos no relatorio final.")
         else:
-            print("\n✓ Nenhum problema crítico detectado!")
+            print("\n Nenhum problema critico detectado!")
         
         return len(alertas_encontrados) == 0
     
@@ -123,14 +109,14 @@ class AnalisadorRESTvsGraphQLCorrigido:
         graphql_valido = self.df_graphql[self.df_graphql['status_code'] == 200].copy()
         
         print(f"\nDados REST originais: {len(self.df_rest)} registros")
-        print(f"Dados REST válidos (status 200): {len(rest_valido)} registros ({len(rest_valido)/len(self.df_rest)*100:.1f}%)")
+        print(f"Dados REST validos (status 200): {len(rest_valido)} registros ({len(rest_valido)/len(self.df_rest)*100:.1f}%)")
         print(f"\nDados GraphQL originais: {len(self.df_graphql)} registros")
-        print(f"Dados GraphQL válidos (status 200): {len(graphql_valido)} registros ({len(graphql_valido)/len(self.df_graphql)*100:.1f}%)")
+        print(f"Dados GraphQL validos (status 200): {len(graphql_valido)} registros ({len(graphql_valido)/len(self.df_graphql)*100:.1f}%)")
         
         self.df_combinado = pd.concat([rest_valido, graphql_valido], ignore_index=True)
         
-        print(f"\nTotal de registros válidos combinados: {len(self.df_combinado)}")
-        print(f"Consultas únicas: {sorted(self.df_combinado['consulta'].unique())}")
+        print(f"\nTotal de registros validos combinados: {len(self.df_combinado)}")
+        print(f"Consultas unicas: {sorted(self.df_combinado['consulta'].unique())}")
         print(f"Tipos de API: {sorted(self.df_combinado['tipo_api'].unique())}")
         
         return rest_valido, graphql_valido
@@ -149,22 +135,22 @@ class AnalisadorRESTvsGraphQLCorrigido:
             print('─' * 80)
             
             for metrica in metricas:
-                print(f"\n  Métrica: {metrica.replace('_', ' ').title()}")
+                print(f"\n  Metrica: {metrica.replace('_', ' ').title()}")
                 print("  " + "─" * 76)
                 
                 rest_data = df_rest[df_rest['consulta'] == consulta][metrica]
                 graphql_data = df_graphql[df_graphql['consulta'] == consulta][metrica]
                 
                 if len(rest_data) == 0 or len(graphql_data) == 0:
-                    print(f"  ⚠️  Dados insuficientes para {consulta} - {metrica}")
+                    print(f"  ATENCAO: Dados insuficientes para {consulta} - {metrica}")
                     continue
                 
-                # Calcular estatísticas para REST
+                # Calcular estatisticas para REST
                 stats_rest = self._calcular_estatisticas(rest_data, "REST")
-                # Calcular estatísticas para GraphQL
+                # Calcular estatisticas para GraphQL
                 stats_graphql = self._calcular_estatisticas(graphql_data, "GraphQL")
                 
-                # Exibir comparação
+                # Exibir comparacao
                 print(f"\n  REST:")
                 self._imprimir_estatisticas(stats_rest)
                 print(f"\n  GraphQL:")
@@ -180,7 +166,7 @@ class AnalisadorRESTvsGraphQLCorrigido:
                 }
     
     def _calcular_estatisticas(self, data, nome):
-        """Calcula todas as estatísticas descritivas"""
+        """Calcula todas as estatisticas descritivas"""
         q1 = np.percentile(data, 25)
         q3 = np.percentile(data, 75)
         iqr = q3 - q1
@@ -212,16 +198,16 @@ class AnalisadorRESTvsGraphQLCorrigido:
         return stats_dict
     
     def _imprimir_estatisticas(self, stats):
-        print(f"    N: {stats['n']} ({stats['valores_unicos']} valores únicos)")
-        print(f"    Média: {stats['media']:.2f}")
+        print(f"    N: {stats['n']} ({stats['valores_unicos']} valores unicos)")
+        print(f"    Media: {stats['media']:.2f}")
         print(f"    Mediana: {stats['mediana']:.2f}")
         print(f"    Moda: {stats['moda']:.2f}")
-        print(f"    Desvio Padrão: {stats['desvio_padrao']:.2f}")
-        print(f"    Variância: {stats['variancia']:.2f}")
+        print(f"    Desvio Padrao: {stats['desvio_padrao']:.2f}")
+        print(f"    Variancia: {stats['variancia']:.2f}")
         print(f"    Amplitude: {stats['amplitude']:.2f} (min: {stats['minimo']:.2f}, max: {stats['maximo']:.2f})")
         print(f"    Q1: {stats['q1']:.2f} | Q2: {stats['q2_mediana']:.2f} | Q3: {stats['q3']:.2f}")
         print(f"    IQR: {stats['iqr']:.2f}")
-        print(f"    Coeficiente de Variação: {stats['cv']:.2f}%")
+        print(f"    Coeficiente de Variacao: {stats['cv']:.2f}%")
         print(f"    Outliers: {stats['outliers_count']}")
     
     def teste_normalidade(self):
@@ -252,7 +238,7 @@ class AnalisadorRESTvsGraphQLCorrigido:
                 stat_rest, p_rest = shapiro(rest_data)
                 stat_graphql, p_graphql = shapiro(graphql_data)
                 
-                # Decisão
+                # Decisao
                 alpha = 0.05
                 rest_normal = p_rest > alpha
                 graphql_normal = p_graphql > alpha
@@ -260,9 +246,9 @@ class AnalisadorRESTvsGraphQLCorrigido:
                 
                 teste_recomendado = "t independente" if ambos_normal else "Mann-Whitney U"
                 
-                print(f"\n  Métrica: {metrica.replace('_', ' ').title()}")
-                print(f"  REST - W: {stat_rest:.4f}, p-valor: {p_rest:.4f} {'✓ Normal' if rest_normal else '✗ Não-normal'}")
-                print(f"  GraphQL - W: {stat_graphql:.4f}, p-valor: {p_graphql:.4f} {'✓ Normal' if graphql_normal else '✗ Não-normal'}")
+                print(f"\n  Metrica: {metrica.replace('_', ' ').title()}")
+                print(f"  REST - W: {stat_rest:.4f}, p-valor: {p_rest:.4f} {' Normal' if rest_normal else ' Nao-normal'}")
+                print(f"  GraphQL - W: {stat_graphql:.4f}, p-valor: {p_graphql:.4f} {' Normal' if graphql_normal else ' Nao-normal'}")
                 print(f"  Teste recomendado: {teste_recomendado}")
                 
                 self.resultados_normalidade[key] = {
@@ -280,8 +266,8 @@ class AnalisadorRESTvsGraphQLCorrigido:
         print("\n" + "=" * 80)
         print("4. TESTE DE HIPÓTESES (AMOSTRAS INDEPENDENTES)")
         print("=" * 80)
-        print("\nH₀: μ_REST = μ_GraphQL (não há diferença)")
-        print("H₁: μ_REST > μ_GraphQL (REST é maior - teste unilateral à direita)")
+        print("\nH₀: μ_REST = μ_GraphQL (nao ha diferenca)")
+        print("H₁: μ_REST > μ_GraphQL (REST e maior - teste unilateral à direita)")
         
         consultas = ['C1', 'C2', 'C3']
         metricas = ['tempo_resposta_ms', 'tamanho_resposta_kb']
@@ -304,7 +290,7 @@ class AnalisadorRESTvsGraphQLCorrigido:
                 
                 ambos_normal = self.resultados_normalidade[key]['ambos_normal']
                 
-                print(f"\n  Métrica: {metrica.replace('_', ' ').title()}")
+                print(f"\n  Metrica: {metrica.replace('_', ' ').title()}")
                 print(f"  n_REST: {len(rest_data)}, n_GraphQL: {len(graphql_data)}")
                 
                 if ambos_normal:
@@ -313,7 +299,7 @@ class AnalisadorRESTvsGraphQLCorrigido:
                     p_value = p_value_bilateral / 2 if stat > 0 else 1 - (p_value_bilateral / 2)
                     
                     print(f"  Teste: t independente (Welch, unilateral)")
-                    print(f"  Estatística t: {stat:.4f}")
+                    print(f"  Estatistica t: {stat:.4f}")
                     print(f"  p-valor: {p_value:.4f}")
                     teste_usado = 't independente'
                 else:
@@ -321,20 +307,20 @@ class AnalisadorRESTvsGraphQLCorrigido:
                     stat, p_value = mannwhitneyu(rest_data, graphql_data, alternative='greater')
                     
                     print(f"  Teste: Mann-Whitney U (unilateral)")
-                    print(f"  Estatística U: {stat:.4f}")
+                    print(f"  Estatistica U: {stat:.4f}")
                     print(f"  p-valor: {p_value:.4f}")
                     teste_usado = 'Mann-Whitney U'
                 
-                # Decisão
+                # Decisao
                 alpha = 0.05
                 rejeita_h0 = p_value < alpha
                 
-                print(f"  Rejeita H₀? {'✓ SIM' if rejeita_h0 else '✗ NÃO'} (α = {alpha})")
+                print(f"  Rejeita H₀? {' SIM' if rejeita_h0 else ' NÃO'} (α = {alpha})")
                 
                 if rejeita_h0:
-                    print(f"  Conclusão: REST apresenta valores SIGNIFICATIVAMENTE MAIORES que GraphQL")
+                    print(f"  Conclusao: REST apresenta valores SIGNIFICATIVAMENTE MAIORES que GraphQL")
                 else:
-                    print(f"  Conclusão: NÃO há diferença significativa entre REST e GraphQL")
+                    print(f"  Conclusao: NÃO ha diferenca significativa entre REST e GraphQL")
                 
                 self.resultados_hipotese[key] = {
                     'teste': teste_usado,
@@ -348,7 +334,7 @@ class AnalisadorRESTvsGraphQLCorrigido:
         print("\n" + "=" * 80)
         print("5. TAMANHO DO EFEITO E INTERVALO DE CONFIANÇA")
         print("=" * 80)
-        print("\n⚠️  ATENÇÃO: Cohen's d > 3 indica possível problema nos dados!")
+        print("\nATENCAO: Cohen's d > 3 indica possivel problema nos dados!")
         
         consultas = ['C1', 'C2', 'C3']
         metricas = ['tempo_resposta_ms', 'tamanho_resposta_kb']
@@ -374,11 +360,11 @@ class AnalisadorRESTvsGraphQLCorrigido:
                 mean1, mean2 = np.mean(rest_data), np.mean(graphql_data)
                 s1, s2 = np.std(rest_data, ddof=1), np.std(graphql_data, ddof=1)
                 
-                # Desvio padrão pooled
+                # Desvio padrao pooled
                 pooled_std = np.sqrt(((n1 - 1) * s1**2 + (n2 - 1) * s2**2) / (n1 + n2 - 2))
                 cohens_d = (mean1 - mean2) / pooled_std if pooled_std > 0 else float('inf')
                 
-                # Interpretação CORRIGIDA
+                # Interpretacao CORRIGIDA
                 abs_d = abs(cohens_d)
                 if abs_d < 0.2:
                     interpretacao = "PEQUENO"
@@ -389,9 +375,9 @@ class AnalisadorRESTvsGraphQLCorrigido:
                 elif abs_d < 3:
                     interpretacao = "MUITO GRANDE"
                 else:
-                    interpretacao = "⚠️  EXTREMAMENTE GRANDE (SUSPEITO!)"
+                    interpretacao = "EXTREMAMENTE GRANDE (SUSPEITO!)"
                 
-                # Intervalo de confiança 95%
+                # Intervalo de confianca 95%
                 diff_mean = mean1 - mean2
                 se_diff = np.sqrt((s1**2 / n1) + (s2**2 / n2))
                 df = n1 + n2 - 2
@@ -400,24 +386,24 @@ class AnalisadorRESTvsGraphQLCorrigido:
                 
                 contem_zero = ic[0] <= 0 <= ic[1]
                 
-                print(f"\n  Métrica: {metrica.replace('_', ' ').title()}")
+                print(f"\n  Metrica: {metrica.replace('_', ' ').title()}")
                 print(f"  Cohen's d: {cohens_d:.4f}")
-                print(f"  Interpretação: {interpretacao}")
+                print(f"  Interpretacao: {interpretacao}")
                 
                 # ALERTA CRÍTICO: Cohen's d extremo
                 if abs_d > 3:
-                    print(f"  ⚠️  ALERTA CRÍTICO: Cohen's d > 3 é EXTREMAMENTE raro!")
-                    print(f"     Isso sugere que REST e GraphQL estão medindo DADOS DIFERENTES,")
-                    print(f"     não apenas 'formatos diferentes do mesmo dado'.")
+                    print(f"  ALERTA CRÍTICO: Cohen's d > 3 e EXTREMAMENTE raro!")
+                    print(f"     Isso sugere que REST e GraphQL estao medindo DADOS DIFERENTES,")
+                    print(f"     nao apenas 'formatos diferentes do mesmo dado'.")
                     self.alertas.append(f"Cohen's d extremo em {consulta} {metrica}: {cohens_d:.2f}")
                 
-                print(f"  IC 95% (diferença): [{ic[0]:.2f}, {ic[1]:.2f}]")
-                print(f"  IC contém zero? {'✓ SIM' if contem_zero else '✗ NÃO'}")
+                print(f"  IC 95% (diferenca): [{ic[0]:.2f}, {ic[1]:.2f}]")
+                print(f"  IC contem zero? {' SIM' if contem_zero else ' NÃO'}")
                 
                 if not contem_zero:
-                    print(f"  Conclusão: Diferença SIGNIFICATIVA (IC não contém 0)")
+                    print(f"  Conclusao: Diferenca SIGNIFICATIVA (IC nao contem 0)")
                 else:
-                    print(f"  Conclusão: Diferença NÃO significativa (IC contém 0)")
+                    print(f"  Conclusao: Diferenca NÃO significativa (IC contem 0)")
                 
                 self.resultados_efeito[key] = {
                     'cohens_d': cohens_d,
@@ -426,6 +412,65 @@ class AnalisadorRESTvsGraphQLCorrigido:
                     'contem_zero': contem_zero,
                     'alerta_extremo': abs_d > 3
                 }
+    
+    def analisar_correlacao(self):
+        print("\n" + "=" * 80)
+        print("6. ANALISE DE CORRELACAO")
+        print("=" * 80)
+        print("\nRelacao entre Tempo de Resposta e Tamanho de Resposta")
+        print("\nObjetivo: Verificar se respostas maiores estao associadas a tempos maiores")
+        print("-" * 80)
+        
+        for consulta in ['C1', 'C2', 'C3']:
+            print(f"\n{consulta}:")
+            print("  " + "-" * 76)
+            
+            for tipo_api in ['REST', 'GraphQL']:
+                dados = self.df_combinado[
+                    (self.df_combinado['consulta'] == consulta) & 
+                    (self.df_combinado['tipo_api'] == tipo_api)
+                ]
+                
+                if len(dados) < 3:
+                    print(f"  {tipo_api}: Dados insuficientes")
+                    continue
+                
+                tempo = dados['tempo_resposta_ms'].values
+                tamanho = dados['tamanho_resposta_kb'].values
+                
+                stat_normal_tempo, p_tempo = shapiro(tempo)
+                stat_normal_tamanho, p_tamanho = shapiro(tamanho)
+                
+                ambos_normais = (p_tempo > 0.05) and (p_tamanho > 0.05)
+                
+                if ambos_normais:
+                    r, p_valor = pearsonr(tempo, tamanho)
+                    teste_usado = "Pearson"
+                else:
+                    r, p_valor = spearmanr(tempo, tamanho)
+                    teste_usado = "Spearman"
+                
+                significativo = "SIM" if p_valor < 0.05 else "NAO"
+                
+                if abs(r) < 0.3:
+                    forca = "FRACA"
+                elif abs(r) < 0.7:
+                    forca = "MODERADA"
+                else:
+                    forca = "FORTE"
+                
+                direcao = "positiva" if r > 0 else "negativa"
+                
+                print(f"  {tipo_api}:")
+                print(f"    Teste: {teste_usado}")
+                print(f"    Coeficiente: r = {r:.4f}")
+                print(f"    p-valor: {p_valor:.4f}")
+                print(f"    Significativo? {significativo} (α = 0.05)")
+                print(f"    Forca: {forca}")
+                print(f"    Interpretacao: Correlacao {direcao} {forca.lower()}")
+                
+                if not (consulta == 'C1' and tipo_api == 'GraphQL'):
+                    print()
     
     def gerar_relatorio_honesto(self):
         print("\n" + "=" * 80)
@@ -437,18 +482,18 @@ class AnalisadorRESTvsGraphQLCorrigido:
         relatorio = []
         relatorio.append("=" * 80)
         relatorio.append("RELATÓRIO COMPLETO: REST vs GraphQL")
-        relatorio.append("Análise Estatística Corrigida e Validada")
+        relatorio.append("Analise Estatistica Corrigida e Validada")
         relatorio.append("=" * 80)
-        relatorio.append(f"Data da análise: {timestamp}")
+        relatorio.append(f"Data da analise: {timestamp}")
         relatorio.append("")
         
         if self.alertas:
-            relatorio.append("⚠️  ALERTAS DE QUALIDADE DOS DADOS")
+            relatorio.append("ALERTAS DE QUALIDADE DOS DADOS")
             relatorio.append("-" * 80)
             for i, alerta in enumerate(self.alertas, 1):
                 relatorio.append(f"{i}. {alerta}")
             relatorio.append("")
-            relatorio.append("ATENÇÃO: Estes alertas indicam possíveis problemas que devem ser")
+            relatorio.append("ATENÇÃO: Estes alertas indicam possiveis problemas que devem ser")
             relatorio.append("considerados ao interpretar os resultados!")
             relatorio.append("")
         
@@ -469,8 +514,8 @@ class AnalisadorRESTvsGraphQLCorrigido:
             if key_tamanho in self.resultados_hipotese and self.resultados_hipotese[key_tamanho]['rejeita_h0']:
                 rejeicoes_tamanho += 1
         
-        relatorio.append(f"Tempo de Resposta: {rejeicoes_tempo}/3 consultas com diferença significativa")
-        relatorio.append(f"Tamanho da Resposta: {rejeicoes_tamanho}/3 consultas com diferença significativa")
+        relatorio.append(f"Tempo de Resposta: {rejeicoes_tempo}/3 consultas com diferenca significativa")
+        relatorio.append(f"Tamanho da Resposta: {rejeicoes_tamanho}/3 consultas com diferenca significativa")
         relatorio.append("")
         
         for consulta in ['C1', 'C2', 'C3']:
@@ -487,17 +532,17 @@ class AnalisadorRESTvsGraphQLCorrigido:
                 metrica_label = "Tempo de Resposta (ms)" if metrica == "tempo_resposta_ms" else "Tamanho da Resposta (KB)"
                 relatorio.append(f"\n{metrica_label}:")
                 
-                # Médias e valores únicos
+                # Medias e valores unicos
                 media_rest = self.resultados[key]['rest']['media']
                 media_graphql = self.resultados[key]['graphql']['media']
                 unicos_rest = self.resultados[key]['rest']['valores_unicos']
                 unicos_graphql = self.resultados[key]['graphql']['valores_unicos']
                 
-                relatorio.append(f"  Média REST: {media_rest:.2f} ({unicos_rest} valores únicos)")
-                relatorio.append(f"  Média GraphQL: {media_graphql:.2f} ({unicos_graphql} valores únicos)")
-                relatorio.append(f"  Diferença: {media_rest - media_graphql:.2f}")
+                relatorio.append(f"  Media REST: {media_rest:.2f} ({unicos_rest} valores unicos)")
+                relatorio.append(f"  Media GraphQL: {media_graphql:.2f} ({unicos_graphql} valores unicos)")
+                relatorio.append(f"  Diferenca: {media_rest - media_graphql:.2f}")
                 
-                # Teste de hipótese
+                # Teste de hipotese
                 hip = self.resultados_hipotese[key]
                 relatorio.append(f"  Teste: {hip['teste']}")
                 relatorio.append(f"  p-valor: {hip['p_value']:.4f}")
@@ -510,7 +555,7 @@ class AnalisadorRESTvsGraphQLCorrigido:
                     relatorio.append(f"  IC 95%: [{efeito['ic_95'][0]:.2f}, {efeito['ic_95'][1]:.2f}]")
                     
                     if efeito['alerta_extremo']:
-                        relatorio.append(f"  ⚠️  ALERTA: Cohen's d extremo - possível comparação injusta!")
+                        relatorio.append(f"  ALERTA: Cohen's d extremo - possivel comparacao injusta!")
         
         # LIMITAÇÕES (NOVO!)
         relatorio.append("")
@@ -518,27 +563,27 @@ class AnalisadorRESTvsGraphQLCorrigido:
         relatorio.append("LIMITAÇÕES DO ESTUDO")
         relatorio.append("-" * 80)
         relatorio.append("")
-        relatorio.append("Este estudo possui as seguintes limitações que devem ser consideradas:")
+        relatorio.append("Este estudo possui as seguintes limitacoes que devem ser consideradas:")
         relatorio.append("")
         
         if any('DADOS DIFERENTES' in alerta for alerta in self.alertas):
             relatorio.append("1. COMPARAÇÃO POSSIVELMENTE INJUSTA:")
-            relatorio.append("   As queries REST e GraphQL podem não estar retornando exatamente")
-            relatorio.append("   os mesmos dados. GraphQL permite selecionar campos específicos,")
+            relatorio.append("   As queries REST e GraphQL podem nao estar retornando exatamente")
+            relatorio.append("   os mesmos dados. GraphQL permite selecionar campos especificos,")
             relatorio.append("   enquanto REST retorna estruturas completas. Isso pode explicar")
-            relatorio.append("   grandes diferenças nos tamanhos de resposta.")
+            relatorio.append("   grandes diferencas nos tamanhos de resposta.")
             relatorio.append("")
         
-        if any('valores únicos' in str(alerta).lower() or 'idênticos' in str(alerta).lower() for alerta in self.alertas):
+        if any('valores unicos' in str(alerta).lower() or 'identicos' in str(alerta).lower() for alerta in self.alertas):
             relatorio.append("2. POSSÍVEL CACHE NÃO DOCUMENTADO:")
             relatorio.append("   Tamanhos de resposta muito constantes sugerem que pode haver")
-            relatorio.append("   cache ou dados estáticos não documentados. Isto reduz a validade")
+            relatorio.append("   cache ou dados estaticos nao documentados. Isto reduz a validade")
             relatorio.append("   externa dos resultados.")
             relatorio.append("")
         
         relatorio.append("3. CONDIÇÕES DE REDE:")
-        relatorio.append("   Testes realizados em ambiente específico. Resultados podem variar")
-        relatorio.append("   com diferentes condições de rede, carga do servidor, etc.")
+        relatorio.append("   Testes realizados em ambiente especifico. Resultados podem variar")
+        relatorio.append("   com diferentes condicoes de rede, carga do servidor, etc.")
         relatorio.append("")
         
         relatorio.append("")
@@ -551,15 +596,13 @@ class AnalisadorRESTvsGraphQLCorrigido:
         elif rejeicoes_tempo > rejeicoes_tamanho:
             relatorio.append("GraphQL apresenta vantagem SIGNIFICATIVA no tempo de resposta.")
         else:
-            relatorio.append("Resultados mistos entre as métricas analisadas.")
+            relatorio.append("Resultados mistos entre as metricas analisadas.")
         
         if self.alertas:
             relatorio.append("")
             relatorio.append("PORÉM, devido aos alertas de qualidade de dados identificados,")
-            relatorio.append("recomenda-se cautela ao interpretar estas conclusões.")
+            relatorio.append("recomenda-se cautela ao interpretar estas conclusoes.")
         
-        relatorio.append("")
-        relatorio.append("Para mais detalhes, consulte os gráficos em '../graficos/'")
         relatorio.append("")
         relatorio.append("=" * 80)
         
@@ -568,20 +611,20 @@ class AnalisadorRESTvsGraphQLCorrigido:
         with open('relatorio_analise_estatistica.txt', 'w', encoding='utf-8') as f:
             f.write(relatorio_texto)
         
-        print("\n  ✓ Relatório salvo: relatorio_analise_estatistica.txt")
+        print("\n   Relatorio salvo: relatorio_analise_estatistica.txt")
         print("\n" + relatorio_texto)
     
     def executar_analise_completa(self):
         print("\n" + "=" * 80)
         print("ANÁLISE ESTATÍSTICA CORRIGIDA: REST vs GraphQL")
-        print("Com validações de qualidade de dados e alertas")
+        print("Com validacoes de qualidade de dados e alertas")
         print("="*80)
         
         dados_validos = self.validar_qualidade_dados()
         
         if not dados_validos:
-            print("\n⚠️  ATENÇÃO: Problemas de qualidade detectados!")
-            print("A análise continuará, mas os resultados devem ser interpretados com cautela.")
+            print("\nATENCAO: Problemas de qualidade detectados!")
+            print("A analise continuara, mas os resultados devem ser interpretados com cautela.")
             input("Pressione ENTER para continuar...")
         
         df_rest, df_graphql = self.preprocessar_dados()
@@ -594,20 +637,22 @@ class AnalisadorRESTvsGraphQLCorrigido:
         
         self.tamanho_efeito_ic()
         
+        self.analisar_correlacao()
+        
         self.gerar_relatorio_honesto()
         
         print("\n" + "=" * 80)
-        print("✓ ANÁLISE COMPLETA FINALIZADA!")
+        print(" ANÁLISE COMPLETA FINALIZADA!")
         print("=" * 80)
         
         if self.alertas:
-            print(f"\n⚠️  {len(self.alertas)} alertas identificados. Veja o relatório para detalhes.")
+            print(f"\nATENCAO:  {len(self.alertas)} alertas identificados. Veja o relatorio para detalhes.")
         else:
-            print("\n✓ Nenhum problema crítico identificado nos dados.")
+            print("\n Nenhum problema critico identificado nos dados.")
 
 
 def main():
-    """Função principal"""
+    """Funcao principal"""
     import sys
     
     import os
@@ -615,15 +660,15 @@ def main():
     arquivo_graphql = '../dados/metricas_graphql.csv'
     
     if not os.path.exists(arquivo_rest) or not os.path.exists(arquivo_graphql):
-        print("❌ ERRO: Arquivos CSV não encontrados!")
+        print("ERRO: Arquivos CSV nao encontrados!")
         print(f"Procurando: {arquivo_rest} e {arquivo_graphql}")
         sys.exit(1)
     
-    print(f"📂 Usando arquivos:")
+    print(f"Usando arquivos:")
     print(f"   REST: {arquivo_rest}")
     print(f"   GraphQL: {arquivo_graphql}")
     
-    analisador = AnalisadorRESTvsGraphQLCorrigido(arquivo_rest, arquivo_graphql)
+    analisador = AnalisadorRESTvsGraphQL(arquivo_rest, arquivo_graphql)
     
     analisador.executar_analise_completa()
 

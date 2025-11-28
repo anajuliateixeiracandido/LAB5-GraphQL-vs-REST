@@ -1,12 +1,10 @@
-# Análise de Resultados e Relatório Final
+# Relatorio Final: REST vs GraphQL
 
----
-
-## 1. Introdução e Hipóteses
+## 1. Introducao e Hipoteses
 
 ### 1.1 Contexto
 
-A escolha entre arquiteturas REST e GraphQL é uma decisão crítica no desenvolvimento de APIs modernas. Enquanto REST é consolidado e amplamente adotado, GraphQL promete maior flexibilidade e eficiência através de consultas customizáveis que retornam apenas os dados solicitados.
+A escolha entre arquiteturas REST e GraphQL e uma decisao critica no desenvolvimento de APIs modernas. Enquanto REST e consolidado e amplamente adotado, GraphQL promete maior flexibilidade e eficiencia atraves de consultas customizaveis que retornam apenas os dados solicitados.
 
 Este experimento investiga empiricamente se GraphQL oferece vantagens mensuráveis em termos de **tempo de resposta** e **tamanho de payload** quando comparado ao REST tradicional, utilizando a API do GitHub como plataforma de teste.
 
@@ -16,19 +14,17 @@ Este experimento investiga empiricamente se GraphQL oferece vantagens mensuráve
 
 **RQ2:** GraphQL apresenta tamanho de resposta significativamente menor que REST?
 
-### 1.3 Hipóteses Estatísticas
+### 1.3 Hipoteses Estatisticas
 
-#### Para Tempo de Resposta (Y₁):
-- **H₀:** μ_REST = μ_GraphQL (não há diferença no tempo)
-- **H₁:** μ_REST > μ_GraphQL (REST é mais lento)
+#### Para Tempo de Resposta (Y1):
+- **H0:** μ_REST = μ_GraphQL (nao ha diferenca no tempo)
+- **H1:** μ_REST ≠ μ_GraphQL (ha diferenca no tempo)
 
-#### Para Tamanho de Resposta (Y₂):
-- **H₀:** μ_REST = μ_GraphQL (não há diferença no tamanho)
-- **H₁:** μ_REST > μ_GraphQL (REST é maior)
+#### Para Tamanho de Resposta (Y2):
+- **H0:** μ_REST = μ_GraphQL (nao ha diferenca no tamanho)
+- **H1:** μ_REST > μ_GraphQL (REST e maior)
 
-**Justificativa teórica:** GraphQL foi projetado para eliminar over-fetching (buscar dados desnecessários) e under-fetching (múltiplas requisições), o que teoricamente deveria resultar em payloads menores e, consequentemente, tempos de resposta reduzidos.
-
-**Nível de significância:** α = 0,05
+**Nivel de significancia:** α = 0.05
 
 ---
 
@@ -38,10 +34,10 @@ Este experimento investiga empiricamente se GraphQL oferece vantagens mensuráve
 
 **Tipo:** Between-Subjects (Grupos Independentes)
 - REST e GraphQL testados separadamente
-- Sem pareamento 1:1 entre medições
-- Randomização independente para cada API
+- Sem pareamento 1:1 entre medicoes
+- Randomizacao independente para cada API
 
-**Justificativa:** Este desenho elimina o efeito de ordem entre tratamentos e permite capturar a variabilidade natural de cada API em condições reais de uso.
+**Justificativa:** Este desenho elimina o efeito de ordem entre tratamentos e permite capturar a variabilidade natural de cada API em condicoes reais de uso.
 
 ### 2.2 Amostra
 
@@ -49,331 +45,404 @@ Este experimento investiga empiricamente se GraphQL oferece vantagens mensuráve
 
 **Objetos Experimentais:**
 - 10 desenvolvedores trending (25/11/2025)
-- Repositórios e issues públicas
+- Repositorios e issues publicas
 
 **Consultas Testadas:**
-| ID | Tipo | Descrição |
+| ID | Tipo | Descricao |
 |----|------|-----------|
-| C1 | Simples | Listar 10 repositórios mais populares |
-| C2 | Específica | Detalhes do repositório mais popular |
-| C3 | Complexa | Listar 10 últimas issues |
+| C1 | Simples | Listar 10 repositorios mais populares |
+| C2 | Especifica | Detalhes do repositorio mais popular |
+| C3 | Complexa | Listar 10 ultimas issues |
 
 **Tamanho Amostral:**
-- 33 repetições por consulta por usuário
-- 10 usuários × 3 consultas × 33 repetições = 990 medições por API
-- **Total: 1.980 medições**
+- 33 repeticoes por consulta por usuario
+- 10 usuarios × 3 consultas × 33 repeticoes = 990 medicoes por API
+- **Total planejado: 1.980 medicoes**
+- **Total valido: 1.648 medicoes (824 REST + 824 GraphQL)**
+- **Taxa de sucesso: 83.2% para ambas APIs**
 
-### 2.3 Ambiente de Execução
+### 2.3 Ambiente de Execucao
 
 - **Hardware:** MacOS
-- **Conexão:** Mesma rede para todas as coletas
+- **Conexao:** Mesma rede para todas as coletas
 - **Cliente HTTP:** Python 3.x com biblioteca `requests`
-- **Período:** 26/11/2025 (coletas em horários próximos)
+- **Periodo:** 27-28/11/2025 (coletas em horarios proximos)
 - **Anti-cache:** Headers `Cache-Control: no-cache`
-- **Rate Limiting:** 12 tokens em rotação (60.000 req/hora total)
+- **Rate Limiting:** Tokens GitHub em rotacao
+- **Delays:** 1-3 segundos aleatorios entre requisicoes
 
 ### 2.4 Procedimento
 
-1. **Fase de Descoberta:** Identificar repositório mais popular de cada usuário
-2. **Randomização:** Ordem aleatória das 99 consultas (33×C1 + 33×C2 + 33×C3)
-3. **Execução:** Delays aleatórios de 1-3s entre requisições
+1. **Fase de Descoberta:** Identificar repositorio mais popular de cada usuario
+2. **Randomizacao:** Ordem aleatoria das 99 consultas (33×C1 + 33×C2 + 33×C3)
+3. **Execucao:** Delays aleatorios de 1-3s entre requisicoes
 4. **Registro:** Tempo (ms), tamanho (KB), status HTTP, timestamp
+5. **Data da Coleta:** 27-28 de novembro de 2025
 
-### 2.5 Validações Executadas
+### 2.5 Validacoes Executadas
 
-Antes da análise estatística, foram executadas validações automáticas para garantir a qualidade dos dados. As verificações incluíram detecção de valores constantes que poderiam indicar cache indevido, comparação de justiça entre as APIs verificando se REST e GraphQL retornavam tamanhos compatíveis, verificação da taxa de sucesso das requisições (percentual de status 200), e alertas para valores extremos de Cohen's d (maiores que 3) que poderiam indicar dados potencialmente incomparáveis.
+Antes da analise estatistica, foram executadas validacoes automaticas para garantir a qualidade dos dados:
+- Deteccao de valores constantes (possivel cache indevido)
+- Comparacao de justica entre APIs (tamanhos compativeis?)
+- Verificacao da taxa de sucesso das requisicoes
+- Alertas para valores extremos de Cohen's d (> 3)
 
 ---
 
 ## 3. Resultados
 
-### 3.1 Validação da Qualidade dos Dados
+### 3.1 Validacao da Qualidade dos Dados
 
 #### Taxa de Sucesso
-- **REST:** 824/990 (83,2%) requisições bem-sucedidas
-- **GraphQL:** 824/990 (83,2%) requisições bem-sucedidas
+- **REST:** 824/990 (83.2%) requisicoes bem-sucedidas
+- **GraphQL:** 824/990 (83.2%) requisicoes bem-sucedidas
 - **Erros comuns:** 401 Unauthorized (tokens expirados/rate limit)
 
-**Interpretação:** Taxa equivalente entre APIs indica condições experimentais balanceadas.
+**Interpretacao:** Taxa equivalente entre APIs indica condicoes experimentais balanceadas.
 
-#### Variação dos Dados
-- **C1 (Listar repos):** 10 valores únicos de tamanho (correspondente aos 10 usuários)
-- **C2 (Detalhes repo):** 10 valores únicos de tamanho
-- **C3 (Issues):** Alta variação (CV > 100%)
+#### Variacao dos Dados
+- **REST C1:** 10 valores unicos, CV=5.09%
+- **REST C2:** 10 valores unicos, CV=61.02%
+- **REST C3:** 7 valores unicos, CV=118.70%
+- **GraphQL C1:** 10 valores unicos, CV=3.27% (variacao muito baixa - ALERTA)
+- **GraphQL C2:** 7 valores unicos, CV=83.89%
+- **GraphQL C3:** 8 valores unicos, CV=99.16%
 
-**Interpretação:** Valores únicos = número de usuários indica que os repositórios não mudaram durante o experimento (30-45 minutos de coleta). Isso é **esperado e normal** para dados estáveis do GitHub.
+#### Comparacao de Tamanhos
+- **C1:** REST=52.92KB vs GraphQL=7.94KB (razao=6.7x)
+- **C2:** REST=9.03KB vs GraphQL=1.03KB (razao=8.7x)
+- **C3:** REST=14.06KB vs GraphQL=12.10KB (razao=1.2x)
 
-### 3.2 Estatísticas Descritivas
-
-#### CONSULTA C1: Listar Repositórios
-
-**Tempo de Resposta (Y₁):**
-| API | N | Média (ms) | Mediana (ms) | DP (ms) | CV (%) |
-|-----|---|------------|--------------|---------|--------|
-| REST | 269 | 507,81 | 465,23 | 179,34 | 35,3 |
-| GraphQL | 267 | 1475,78 | 1389,56 | 463,91 | 31,4 |
-
-**Tamanho de Resposta (Y₂):**
-| API | N | Média (KB) | Mediana (KB) | DP (KB) | CV (%) |
-|-----|---|------------|--------------|---------|--------|
-| REST | 269 | 53,07 | 53,21 | 2,74 | 5,16 |
-| GraphQL | 267 | 7,96 | 7,98 | 0,24 | 3,01 |
-
-**Razão:** REST é 6,7× maior que GraphQL em C1
+**Interpretacao:** Valores unicos = numero de usuarios indica que os repositorios nao mudaram durante o experimento (cerca de 30-45 minutos de coleta). Isso e esperado e normal para dados estaveis do GitHub.
 
 ---
 
-#### CONSULTA C2: Detalhes do Repositório
+### 3.2 Estatisticas Descritivas
 
-**Tempo de Resposta (Y₁):**
-| API | N | Média (ms) | Mediana (ms) | DP (ms) | CV (%) |
-|-----|---|------------|--------------|---------|--------|
-| REST | 284 | 459,36 | 421,78 | 274,13 | 59,7 |
-| GraphQL | 271 | 624,20 | 578,45 | 274,35 | 43,9 |
+#### CONSULTA C1: Listar Repositorios
 
-**Tamanho de Resposta (Y₂):**
-| API | N | Média (KB) | Mediana (KB) | DP (KB) | CV (%) |
+**Tempo de Resposta (Y1):**
+| API | N | Media (ms) | Mediana (ms) | DP (ms) | CV (%) |
 |-----|---|------------|--------------|---------|--------|
-| REST | 284 | 7,54 | 7,12 | 4,27 | 56,6 |
-| GraphQL | 271 | 1,04 | 0,95 | 0,54 | 51,9 |
+| REST | 273 | 602.30 | 567.09 | 158.26 | 26.28 |
+| GraphQL | 271 | 1554.92 | 1500.99 | 298.92 | 19.22 |
+
+**Tamanho de Resposta (Y2):**
+| API | N | Media (KB) | Mediana (KB) | DP (KB) | CV (%) |
+|-----|---|------------|--------------|---------|--------|
+| REST | 273 | 52.92 | 52.66 | 2.69 | 5.09 |
+| GraphQL | 271 | 7.94 | 7.99 | 0.26 | 3.27 |
+
+**Razao:** REST e 6.7× maior que GraphQL em C1
+
+---
+
+#### CONSULTA C2: Detalhes do Repositorio
+
+**Tempo de Resposta (Y1):**
+| API | N | Media (ms) | Mediana (ms) | DP (ms) | CV (%) |
+|-----|---|------------|--------------|---------|--------|
+| REST | 276 | 590.91 | 570.08 | 135.89 | 23.00 |
+| GraphQL | 273 | 728.80 | 681.54 | 294.03 | 40.34 |
+
+**Tamanho de Resposta (Y2):**
+| API | N | Media (KB) | Mediana (KB) | DP (KB) | CV (%) |
+|-----|---|------------|--------------|---------|--------|
+| REST | 276 | 9.03 | 5.48 | 5.51 | 61.02 |
+| GraphQL | 273 | 1.03 | 0.22 | 0.87 | 83.89 |
+
+**Razao:** REST e 8.7× maior que GraphQL em C2
 
 ---
 
 #### CONSULTA C3: Listar Issues
 
-**Tempo de Resposta (Y₁):**
-| API | N | Média (ms) | Mediana (ms) | DP (ms) | CV (%) |
+**Tempo de Resposta (Y1):**
+| API | N | Media (ms) | Mediana (ms) | DP (ms) | CV (%) |
 |-----|---|------------|--------------|---------|--------|
-| REST | 271 | 482,99 | 445,12 | 195,93 | 40,6 |
-| GraphQL | 286 | 539,17 | 498,34 | 196,21 | 36,4 |
+| REST | 275 | 602.55 | 599.53 | 123.15 | 20.44 |
+| GraphQL | 280 | 686.94 | 684.72 | 248.89 | 36.23 |
 
-**Tamanho de Resposta (Y₂):**
-| API | N | Média (KB) | Mediana (KB) | DP (KB) | CV (%) |
+**Tamanho de Resposta (Y2):**
+| API | N | Media (KB) | Mediana (KB) | DP (KB) | CV (%) |
 |-----|---|------------|--------------|---------|--------|
-| REST | 271 | 15,30 | 12,45 | 16,72 | 109,3 |
-| GraphQL | 286 | 9,91 | 7,89 | 10,85 | 109,5 |
+| REST | 275 | 14.06 | 8.55 | 16.69 | 118.70 |
+| GraphQL | 280 | 12.10 | 15.19 | 12.00 | 99.16 |
+
+**Razao:** REST e 1.2× maior que GraphQL em C3 (diferenca pequena)
 
 ---
 
 ### 3.3 Teste de Normalidade (Shapiro-Wilk)
 
-Após aplicação do teste de Shapiro-Wilk, a maioria das distribuições apresentou **não-normalidade** (p < 0,05), especialmente devido à presença de outliers e assimetrias. Por este motivo, utilizou-se o **teste não-paramétrico Mann-Whitney U** para todas as comparações.
+Apos aplicacao do teste de Shapiro-Wilk, todas as distribuicoes apresentaram **nao-normalidade** (p < 0.05), especialmente devido a presenca de outliers e assimetrias. Por este motivo, utilizou-se o **teste nao-parametrico Mann-Whitney U** para todas as comparacoes.
 
-**Decisão metodológica:** Mann-Whitney U foi escolhido por ser robusto a violações de normalidade e não fazer suposições sobre a distribuição dos dados.
-
----
-
-### 3.4 Testes de Hipóteses
-
-#### RQ1: GraphQL é mais rápido que REST? (Tempo de Resposta)
-
-| Consulta | Teste Usado | Estatística | p-valor | Rejeita H₀? | Conclusão |
-|----------|-------------|-------------|---------|-------------|-----------|
-| C1 | Mann-Whitney U | U = 35784 | 1,0000 | NÃO | REST foi mais rápido, mas NÃO significativo |
-| C2 | Mann-Whitney U | U = 38654 | 0,9763 | NÃO | GraphQL foi mais lento, mas NÃO significativo |
-| C3 | Mann-Whitney U | U = 38912 | 0,7686 | NÃO | Tempos similares, NÃO significativo |
-
-**Resposta RQ1:** NÃO. Não há evidência estatística de que GraphQL seja significativamente mais rápido que REST. Na verdade, GraphQL apresentou tempos maiores em todas as consultas, mas sem significância estatística (p > 0,75).
+**Decisao metodologica:** Mann-Whitney U foi escolhido por ser robusto a violacoes de normalidade e nao fazer suposicoes sobre a distribuicao dos dados.
 
 ---
 
-#### RQ2: GraphQL é menor que REST? (Tamanho de Resposta)
+### 3.4 Testes de Hipoteses
 
-| Consulta | Teste Usado | Estatística | p-valor | Rejeita H₀? | Conclusão |
+#### RQ1: GraphQL e mais rapido que REST? (Tempo de Resposta)
+
+| Consulta | Teste Usado | Estatistica | p-valor | Rejeita H0? | Conclusao |
 |----------|-------------|-------------|---------|-------------|-----------|
-| C1 | Mann-Whitney U | U = 71823 | 0,0000 | SIM | GraphQL 85% menor (p < 0,001) |
-| C2 | Mann-Whitney U | U = 77012 | 0,0000 | SIM | GraphQL 86% menor (p < 0,001) |
-| C3 | Mann-Whitney U | U = 38765 | 0,2586 | NÃO | GraphQL menor mas NÃO significativo |
+| C1 | Mann-Whitney U | U = 300.0 | 1.0000 | NAO | GraphQL foi MAIS LENTO (NAO significativo) |
+| C2 | Mann-Whitney U | U = 28496.0 | 1.0000 | NAO | GraphQL foi MAIS LENTO (NAO significativo) |
+| C3 | Mann-Whitney U | U = 30362.5 | 1.0000 | NAO | GraphQL foi MAIS LENTO (NAO significativo) |
 
-**Resposta RQ2:** SIM (parcialmente). GraphQL gera payloads significativamente menores em C1 e C2 (p < 0,001), com redução de 85-86%. Em C3, a diferença não foi significativa (p = 0,26).
+**Resposta RQ1:** NAO. GraphQL foi consistentemente MAIS LENTO que REST em todas as consultas, embora as diferencas nao sejam estatisticamente significativas (p = 1.0000).
+
+**Observacao importante:** Os valores de p = 1.0000 indicam que REST apresentou tempos consistentemente menores, mas sem significancia estatistica ao nivel α = 0.05.
+
+---
+
+#### RQ2: GraphQL e menor que REST? (Tamanho de Resposta)
+
+| Consulta | Teste Usado | Estatistica | p-valor | Rejeita H0? | Conclusao |
+|----------|-------------|-------------|---------|-------------|-----------|
+| C1 | Mann-Whitney U | U = 73983.0 | 0.0000 | SIM | GraphQL 85% menor (p < 0.001) |
+| C2 | Mann-Whitney U | U = 75348.0 | 0.0000 | SIM | GraphQL 89% menor (p < 0.001) |
+| C3 | Mann-Whitney U | U = 34384.0 | 0.9858 | NAO | Tamanhos similares (NAO significativo) |
+
+**Resposta RQ2:** SIM (parcialmente). GraphQL gera payloads significativamente menores em C1 e C2 (p < 0.001), com reducao de 85-89%. Em C3, a diferenca nao foi significativa (p = 0.99).
 
 ---
 
 ### 3.5 Tamanho do Efeito (Cohen's d)
 
 #### Tempo de Resposta:
-| Consulta | d de Cohen | Interpretação | IC 95% | Contém zero? |
+| Consulta | d de Cohen | Interpretacao | IC 95% | Contem zero? |
 |----------|------------|---------------|---------|--------------|
-| C1 | -2,09 | Muito grande (GraphQL mais lento) | [-1046,59, -889,34] | NÃO |
-| C2 | -0,60 | Grande (GraphQL mais lento) | [-210,04, -119,64] | NÃO |
-| C3 | -0,29 | Médio (GraphQL mais lento) | [-89,12, -23,25] | NÃO |
+| C1 | -3.99 | EXTREMAMENTE GRANDE - SUSPEITO | [-992.94, -912.29] | NAO |
+| C2 | -0.60 | GRANDE | [-176.37, -99.43] | NAO |
+| C3 | -0.43 | MEDIO | [-117.05, -51.74] | NAO |
+
+**ALERTA CRITICO:** Cohen's d = -3.99 em C1 e extremamente raro e sugere que REST e GraphQL podem estar medindo DADOS DIFERENTES, nao apenas formatos diferentes do mesmo dado.
 
 #### Tamanho de Resposta:
-| Consulta | d de Cohen | Interpretação | IC 95% | Contém zero? |
+| Consulta | d de Cohen | Interpretacao | IC 95% | Contem zero? |
 |----------|------------|---------------|---------|--------------|
-| C1 | 23,15 | Extremamente grande (REST > GraphQL) | [44,78, 45,43] | NÃO |
-| C2 | 1,98 | Muito grande (REST > GraphQL) | [5,96, 7,04] | NÃO |
-| C3 | 0,40 | Médio (REST > GraphQL) | [3,09, 7,68] | NÃO |
+| C1 | 23.46 | EXTREMAMENTE GRANDE - SUSPEITO | [44.65, 45.29] | NAO |
+| C2 | 2.02 | MUITO GRANDE | [7.34, 8.66] | NAO |
+| C3 | 0.13 | PEQUENO | [-0.47, 4.38] | SIM |
 
-**Interpretação:**
-- |d| < 0,2: efeito desprezível
-- 0,2 ≤ |d| < 0,5: efeito pequeno
-- 0,5 ≤ |d| < 0,8: efeito médio
-- |d| ≥ 0,8: efeito grande
+**ALERTA CRITICO:** Cohen's d = 23.46 em C1 e extremamente alto, indicando diferenca massiva nos tamanhos das respostas.
 
 ---
 
-### 3.6 Análise de Correlação
+### 3.6 Analise de Correlacao
 
-**Correlação entre Tempo (Y₁) e Tamanho (Y₂):**
+A analise de correlacao investiga a relacao entre tempo de resposta e tamanho de resposta dentro de cada API.
 
-| API | Teste | Coeficiente | p-valor | Interpretação |
-|-----|-------|-------------|---------|---------------|
-| REST | Spearman | ρ = 0,18 | 0,045 | Correlação fraca positiva |
-| GraphQL | Spearman | ρ = 0,22 | 0,012 | Correlação fraca positiva |
+#### Metodologia
+- **Teste de Normalidade:** Shapiro-Wilk aplicado a tempo e tamanho
+- **Escolha do Teste:**
+  - Pearson (r): usado quando ambas variaveis sao normais
+  - Spearman (ρ): usado quando pelo menos uma variavel e nao-normal
+- **Interpretacao:**
+  - |r| < 0.3: correlacao fraca
+  - 0.3 ≤ |r| < 0.7: correlacao moderada
+  - |r| ≥ 0.7: correlacao forte
+  - p-valor < 0.05: correlacao significativa
 
-**Interpretação:** Correlação fraca positiva indica que payloads maiores tendem levemente a resultar em tempos maiores, mas a relação não é forte. Isso sugere que o tempo de resposta é influenciado por outros fatores além do tamanho do payload (latência de rede, processamento do servidor, etc.).
+#### Resultados REST
 
----
+| Consulta | Teste | Coeficiente | p-valor | Interpretacao |
+|----------|-------|-------------|---------|---------------|
+| C1 | Spearman | ρ = -0.0754 | p = 0.2144 | Correlacao negativa fraca, NAO significativa |
+| C2 | Spearman | ρ = 0.2449 | p < 0.001 | Correlacao positiva fraca, SIGNIFICATIVA |
+| C3 | Spearman | ρ = 0.2625 | p < 0.001 | Correlacao positiva fraca, SIGNIFICATIVA |
 
-## 4. Discussão
+#### Resultados GraphQL
 
-### 4.1 Interpretação dos Resultados
+| Consulta | Teste | Coeficiente | p-valor | Interpretacao |
+|----------|-------|-------------|---------|---------------|
+| C1 | Spearman | ρ = -0.0604 | p = 0.3219 | Correlacao negativa fraca, NAO significativa |
+| C2 | Spearman | ρ = 0.7951 | p < 0.001 | Correlacao positiva FORTE, SIGNIFICATIVA |
+| C3 | Spearman | ρ = 0.5540 | p < 0.001 | Correlacao positiva MODERADA, SIGNIFICATIVA |
 
-#### 4.1.1 Tempo de Resposta (RQ1)
+**Interpretacao Geral:**
 
-Os testes estatísticos indicaram que não há evidência significativa de diferença no tempo de resposta entre REST e GraphQL. Em todas as três consultas testadas, os p-valores foram superiores a 0,75, indicando que não é possível rejeitar a hipótese nula. Embora GraphQL tenha apresentado tempos de resposta maiores em todas as consultas, com Cohen's d variando de -0,29 a -2,09, a alta variabilidade dos dados impediu que essas diferenças alcançassem significância estatística. A diferença absoluta observada em milissegundos pode não ser relevante em aplicações reais, especialmente considerando outros fatores que influenciam o desempenho total de uma aplicação.
+1. **C1 (Listar Repositorios):**
+   - Ambas APIs mostram correlacao **fraca e nao-significativa**
+   - Correlacao **negativa** (contraintuitiva): pode indicar que tempos maiores nao estao relacionados ao tamanho
+   - **Possivel explicacao:** Tamanhos muito constantes em C1 (CV baixo) limitam a analise de correlacao
 
-#### 4.1.2 Tamanho de Resposta (RQ2)
+2. **C2 (Detalhes do Repositorio):**
+   - **REST:** correlacao positiva fraca (ρ = 0.24) mas significativa
+   - **GraphQL:** correlacao positiva **FORTE** (ρ = 0.80) e altamente significativa
+   - **Interpretacao:** Em GraphQL C2, respostas maiores estao fortemente associadas a tempos maiores
+   - Sugere que **GraphQL e mais sensivel ao tamanho da resposta** nesta consulta
 
-Os resultados confirmaram que GraphQL gera payloads significativamente menores em consultas C1 e C2 (p < 0,001), com redução de aproximadamente 85-86%. Esta diferença representa um efeito extremamente grande (d > 20 para C1 e d = 1,98 para C2), o que é esperado dado que GraphQL permite selecionar campos específicos enquanto REST retorna estruturas completas predefinidas. Para a consulta C3, embora GraphQL tenha apresentado payload menor (redução de 35%), a diferença não foi estatisticamente significativa (p = 0,26), possivelmente devido à maior variabilidade dos dados de issues. Essas diferenças têm implicações práticas importantes em termos de largura de banda, custos de transferência de dados e desempenho em redes com limitações.
+3. **C3 (Listar Issues):**
+   - **REST:** correlacao positiva fraca (ρ = 0.26) mas significativa
+   - **GraphQL:** correlacao positiva **MODERADA** (ρ = 0.55) e significativa
+   - **Interpretacao:** GraphQL novamente mostra relacao mais forte entre tamanho e tempo
 
----
+**Conclusao da Analise de Correlacao:**
+- **GraphQL** apresenta correlacoes **mais fortes** entre tamanho e tempo (C2 e C3)
+- Sugere que o tempo de processamento GraphQL e **mais dependente do tamanho da resposta**
+- **REST** mostra correlacoes mais fracas, indicando que outros fatores (latencia de rede, cache) podem dominar
+- Todas as analises usaram **Spearman** devido a nao-normalidade dos dados
 
-### 4.2 Validade dos Resultados
-
-#### 4.2.1 Validade Interna
-
-**Pontos Fortes:**
-
-A validade interna do experimento foi assegurada através de diversos controles metodológicos. Utilizou-se randomização da ordem de execução dentro de cada API para eliminar viés temporal. O controle rigoroso de variáveis foi mantido executando todas as coletas no mesmo ambiente, mesma rede e em horários próximos. O número de repetições (33 por consulta) foi adequado para capturar a variabilidade natural dos dados. Além disso, a taxa de sucesso equivalente entre as duas APIs (83,2%) demonstra que as condições experimentais foram balanceadas.
-
-**Limitações:**
-
-Algumas limitações devem ser consideradas na interpretação dos resultados. Nas consultas C1 e C2 foram observados apenas 10 valores únicos de tamanho, correspondentes aos 10 usuários testados, indicando que os repositórios permaneceram estáveis durante o período de coleta. A taxa de 17% de falhas (erros 401) reduziu o poder estatístico das análises, embora não tenha comprometido a validade geral dos resultados. Adicionalmente, GraphQL não pode replicar exatamente a estrutura JSON do REST devido a diferenças arquiteturais intrínsecas entre as duas tecnologias.
-
-#### 4.2.2 Validade Externa
-
-**Generalização:**
-
-O experimento apresenta boas características de validade externa ao utilizar uma API real (GitHub) com dados reais de produção e usuários trending com alta atividade. No entanto, os resultados são específicos para a API do GitHub e podem diferir em outras plataformas que implementam REST e GraphQL de maneiras distintas. Além disso, os repositórios não mudaram durante o período de coleta, o que resultou em dados relativamente estáticos que podem não representar completamente cenários de maior volatilidade.
-
-#### 4.2.3 Ameaças Mitigadas
-
-| Ameaça | Como Foi Controlada |
-|--------|---------------------|
-| Cache | Headers anti-cache + randomização |
-| Carga do servidor | Coleta em horários próximos + 33 repetições |
-| Rate limiting | 12 tokens em rotação + delays |
-| Efeito de ordem | Randomização completa |
-| Variação de rede | Mesma conexão para todas as coletas |
-
----
-
-### 4.3 Limitações e Trabalhos Futuros
-
-#### 4.3.1 Limitações Reconhecidas
-
-1. **Comparação Aproximada:**
-   - GraphQL não pode retornar exatamente a mesma estrutura que REST
-   - Alguns campos REST não existem em GraphQL
-   - **Mitigação aplicada:** GraphQL busca TODOS os campos disponíveis
-
-2. **Dados Estáticos:**
-   - Repositórios não mudaram durante 30-45min de coleta
-   - Reduz variação natural dos dados
-   - **Contexto:** Normal para dados do GitHub em curto período
-
-3. **Cache Não Controlado:**
-   - GitHub pode ter múltiplos níveis de cache
-   - Headers `no-cache` podem não ser 100% efetivos
-   - **Mitigação aplicada:** Randomização + análise de variação
-
-4. **Cohen's d Extremo (> 20 para tamanho):**
-   - Indica que REST e GraphQL retornam volumes muito diferentes
-   - **Interpretação:** Esperado por design (GraphQL seleciona campos)
-   - **Conclusão:** Diferença é real, não artefato experimental
-
-#### 4.3.2 Sugestões para Trabalhos Futuros
-
-1. **Aumentar variação temporal:**
-   - Coletar dados em múltiplos dias/horários
-   - Capturar mudanças naturais dos repositórios
-
-2. **Testar outras APIs:**
-   - Replicar experimento com Shopify, Hasura, etc.
-   - Avaliar generalização dos resultados
-
-3. **Consultas mais complexas:**
-   - Testar queries com múltiplos níveis de aninhamento
-   - Comparar situações de over-fetching severo
-
-4. **Análise de custos:**
-   - Calcular economia de largura de banda
-   - Avaliar impacto em aplicações móveis
+**NOTA:** Os valores foram obtidos da execucao mais recente do script `analise_estatistica.py` (28/11/2025 09:17:36).
 
 ---
 
-### 4.4 Conclusões Finais
+## 4. Discussao
 
-#### 4.4.1 Resposta às Perguntas de Pesquisa
+### 4.1 Tempo de Resposta (RQ1)
 
-**RQ1: GraphQL é mais rápido que REST?**
+**Resultado surpreendente:** Ao contrario da expectativa teorica, GraphQL foi consistentemente MAIS LENTO que REST em todas as tres consultas:
+- C1: GraphQL 158% mais lento (1554ms vs 602ms)
+- C2: GraphQL 23% mais lento (728ms vs 590ms)
+- C3: GraphQL 14% mais lento (686ms vs 602ms)
 
-Os resultados indicam que não há evidência conclusiva de que GraphQL seja significativamente mais rápido que REST nas condições testadas. Embora tenham sido observadas tendências de tempos maiores para GraphQL em todas as consultas, a alta variabilidade nos tempos de resposta impediu uma conclusão definitiva (p > 0,05 em todas as três consultas).
+**Possíveis explicacoes:**
+1. **Overhead de processamento:** GraphQL requer parsing e resolucao de queries complexas no servidor
+2. **Otimizacao REST:** A API REST do GitHub e altamente otimizada e madura
+3. **Cache REST:** Apesar dos headers anti-cache, REST pode ter camadas adicionais de cache
+4. **Latencia de rede:** Nao compensada pela reducao de payload nas condicoes testadas
+5. **C1 anomalo:** Cohen's d = -3.99 sugere possivel problema experimental nesta consulta
 
-**RQ2: GraphQL gera payloads menores que REST?**
+**Limitacao:** Os testes estatisticos nao detectaram significancia (p = 1.0), possivelmente devido a alta variabilidade ou tamanho amostral insuficiente.
 
-Sim. Os resultados confirmam que GraphQL gera payloads significativamente menores que REST (p < 0,001 em C1 e C2), com redução de 85-86% no tamanho das respostas. Esta diferença representa um efeito muito grande (d > 20) e tem implicações práticas relevantes para economia de largura de banda.
+### 4.2 Tamanho de Resposta (RQ2)
 
-#### 4.4.2 Implicações Práticas
+**Resultado confirmado:** GraphQL demonstrou clara vantagem na reducao de payload:
+- C1: 85% menor (7.94KB vs 52.92KB) - SIGNIFICATIVO
+- C2: 89% menor (1.03KB vs 9.03KB) - SIGNIFICATIVO  
+- C3: 14% menor (12.10KB vs 14.06KB) - NAO significativo
 
-**Quando escolher GraphQL:**
-- Aplicações móveis (economia de dados)
-- Múltiplos clientes com necessidades diferentes
-- Over-fetching é um problema real
-- Largura de banda é limitada/cara
+**Explicacao:**
+- **Over-fetching eliminado:** GraphQL retorna apenas campos solicitados
+- **REST verbose:** REST retorna estruturas completas com muitos campos desnecessarios
+- **C3 similar:** Consultas de issues tem estrutura semelhante em ambas APIs
 
-**Quando REST pode ser suficiente:**
-- APIs simples com poucos endpoints
-- Clientes com necessidades homogêneas
-- Equipe sem experiência em GraphQL
-- Performance de tempo é crítica
+**Implicacoes praticas:**
+- Economia de largura de banda
+- Menor consumo de dados moveis
+- Menor tempo de transferencia (embora nao observado em RQ1)
 
-#### 4.4.3 Contribuições do Estudo
+### 4.3 Alertas de Qualidade e suas Explicacoes
 
-1. **Evidência empírica:** Dados reais da API GitHub
-2. **Metodologia rigorosa:** Desenho experimental robusto
-3. **Transparência:** Limitações claramente documentadas
-4. **Reprodutibilidade:** Scripts e dados disponíveis
+O experimento identificou 5 alertas metodologicos:
+
+#### Alerta 1: GraphQL C1 tem variacao muito baixa (CV=3.3%)
+- **Natureza:** Caracteristica dos dados, NAO e erro
+- **Explicacao:** Tamanhos de resposta muito constantes indicam que os repositorios retornaram estruturas similares
+- **Causa:** 10 usuarios com repositorios de tamanhos parecidos + dados estaveis do GitHub
+- **Impacto:** MINIMO - esperado para dados reais de APIs estabilizadas
+- **Correcao necessaria?** NAO - e comportamento legitimo
+
+#### Alertas 2 e 3: Taxa de sucesso 83.2% (166 falhas)
+- **Natureza:** Limitacao experimental
+- **Explicacao:** 166 requisicoes falharam com 401 Unauthorized
+- **Causa:** Rate limiting do GitHub (5000 req/hora) e tokens expirados/rotacionados
+- **Impacto:** MODERADO - reduz tamanho amostral de 990 para 824 por API
+- **Correcao possivel?** SIM - nova coleta com mais tokens ou intervalos maiores
+- **Justificativa:** Taxa de 83.2% ainda e aceitavel (> 80%), e identica para ambas APIs (comparacao justa)
+
+#### Alertas 4 e 5: Cohen's d extremo em C1
+- **Tempo:** d = -3.99 (GraphQL 158% mais lento)
+- **Tamanho:** d = 23.46 (REST 6.7x maior)
+
+**Analise Detalhada:**
+- **Natureza:** NAO e erro estatistico - reflete diferencas REAIS entre as APIs
+- **Explicacao tecnica:**
+  - REST C1: Retorna objetos completos com todos os campos (52KB media)
+  - GraphQL C1: Retorna apenas campos solicitados (7.94KB media)
+  - Diferenca de **44.97KB** (6.7x) e **legitima e esperada**
+  
+- **Por que Cohen's d tao alto?**
+  - Numerador: Diferenca de medias muito grande (952ms para tempo, 45KB para tamanho)
+  - Denominador: Desvio-padrao pooled pequeno (dados com baixa variacao)
+  - Resultado: d = (diferenca grande) / (variacao pequena) = valor extremo
+
+- **E problema?** NAO para o tamanho (objetivo do GraphQL), ATENCAO para o tempo
+  - **Tamanho:** Cohen's d alto e **esperado** - GraphQL foi projetado para reduzir payload
+  - **Tempo:** Cohen's d alto e **surpresa** - GraphQL deveria ser mais rapido, nao 158% mais lento
+  
+- **Correcao necessaria?** NAO no codigo, SIM na interpretacao:
+  - Alertas servem para lembrar que C1 tem comportamento anomalo
+  - Necessario investigar por que GraphQL C1 e tao mais lento
+  - Possivel causa: overhead de parsing/resolucao de queries complexas
+
+**Conclusao dos Alertas:** 
+Os alertas **NAO indicam erros de implementacao**, mas sim **caracteristicas metodologicas importantes** que devem ser consideradas na interpretacao. Os valores extremos de Cohen's d em C1 sao **matematicamente corretos** e refletem diferencas reais entre as arquiteturas.
+
+### 4.4 Ameacas a Validade
+
+**Ameacas Internas:**
+- Implementacao diferente entre APIs (GraphQL mais nova, menos otimizada?)
+- Possível cache nao documentado no lado do servidor
+- Taxa de sucesso de 83.2% indica problemas com tokens/rate limiting
+
+**Ameacas Externas:**
+- Resultados especificos para API do GitHub
+- Condicoes de rede especificas do ambiente de teste
+- Horario das coletas pode ter afetado carga do servidor
+
+**Ameacas de Constructo:**
+- Medicao de tempo inclui latencia de rede (nao apenas processamento)
+- C1 pode estar medindo operacoes diferentes entre APIs
 
 ---
 
-### 4.5 Declaração de Honestidade Científica
+## 5. Conclusoes
 
-Este experimento foi conduzido com rigor metodológico e apresenta suas limitações de forma transparente. Os resultados refletem as condições específicas testadas (API GitHub, consultas definidas, período específico) e não devem ser generalizados sem cautela.
+### 5.1 Respostas as Perguntas de Pesquisa
 
-As diferenças observadas são reais, mas sua relevância prática depende do contexto de aplicação. Cohen's d extremo para tamanho de resposta (> 20) é esperado dadas as diferenças arquiteturais entre REST e GraphQL, não indicando falha experimental.
+**RQ1: GraphQL e mais rapido que REST?**
+- **Resposta:** NAO. GraphQL foi consistentemente mais lento em todas as consultas.
+- **Evidencia:** Diferencas de 14% a 158%, mas sem significancia estatistica.
+
+**RQ2: GraphQL tem respostas menores que REST?**
+- **Resposta:** SIM. GraphQL reduz significativamente o tamanho das respostas.
+- **Evidencia:** Reducao de 85-89% em C1 e C2 (p < 0.001).
+
+### 5.2 Implicacoes Praticas
+
+**Quando usar GraphQL:**
+- Aplicacoes moveis com restricao de banda
+- Cenarios onde over-fetching e problema critico
+- Quando flexibilidade de consulta e mais importante que velocidade
+
+**Quando usar REST:**
+- Aplicacoes onde tempo de resposta e critico
+- Quando APIs sao otimizadas e maduras
+- Consultas simples e padronizadas
+
+### 5.3 Limitacoes do Estudo
+
+1. **Taxa de sucesso:** 83.2% indica problemas com rate limiting
+2. **C1 anomalo:** Cohen's d extremo sugere possivel problema experimental
+3. **Ambiente especifico:** Resultados validos apenas para API GitHub
+4. **Sem significancia em RQ1:** Necessario maior tamanho amostral
+5. **Medicao de tempo:** Inclui latencia de rede, nao apenas processamento
+
+### 5.4 Trabalhos Futuros
+
+1. Repetir experimento com maior tamanho amostral (n > 1000 por consulta)
+2. Investigar C1 separadamente para entender Cohen's d extremo
+3. Medir tempo de processamento no servidor (excluindo rede)
+4. Testar outras APIs alem do GitHub
+5. Analisar consumo de CPU/memoria no cliente
+6. Avaliar performance com cache habilitado
 
 ---
 
-## Apêndices
+## 6. Referencias
 
-### A. Estrutura dos Arquivos de Dados
-
-**Localização:** `dados/metricas_rest.csv` e `dados/metricas_graphql.csv`
-
-**Formato:**
-```csv
-id_execucao,usuario,consulta,tipo_api,tempo_resposta_ms,tamanho_resposta_kb,status_code,timestamp,observacoes
-1,bradfitz,C1,REST,1234.56,53.21,200,2025-11-26T10:15:30,OK
-```
-
-### B. Scripts Utilizados
-
-- `scripts/scriptRest.py` - Coleta de dados REST
-- `scripts/graphQL.py` - Coleta de dados GraphQL  
-- `analises/analise_estatistica.py` - Análise estatística completa
+- GitHub REST API v3: https://docs.github.com/rest
+- GitHub GraphQL API v4: https://docs.github.com/graphql
+- Mann-Whitney U Test: Teste nao-parametrico para amostras independentes
+- Cohen's d: Medida de tamanho de efeito padronizada
+- Shapiro-Wilk: Teste de normalidade
 
 ---
 
+**Data da Analise:** 28 de novembro de 2025
+**Periodo de Coleta:** 27-28 de novembro de 2025
+**Total de Medicoes Validas:** 1.648 (824 REST + 824 GraphQL)
