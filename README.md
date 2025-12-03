@@ -336,64 +336,11 @@ LAB5-GraphQL-vs-REST/
 
 ---
 
-## 10. Como Executar o Experimento
-
-### 10.1 Pré-requisitos
-
-```bash
-pip install requests pandas numpy scipy matplotlib seaborn
-```
-
-### 10.2 Configurar Tokens do GitHub
-
-**OBRIGATÓRIO:** Edite os arquivos `scripts/scriptRest.py` e `scripts/graphQL.py` e adicione seus tokens:
-
-```python
-TOKENS = [
-    "github_pat_SEU_TOKEN_1",
-    "github_pat_SEU_TOKEN_2",
-    # ... adicione até 12 tokens
-]
-```
-
-**Como obter tokens:**
-1. Acesse https://github.com/settings/tokens
-2. Clique em "Generate new token (classic)"
-3. Selecione permissões: `repo`, `read:user`
-4. Copie e adicione aos scripts
-
-### 10.3 Executar Coleta de Dados
-
-```bash
-# Coleta REST (30-45 minutos)
-cd scripts
-python scriptRest.py
-
-# Coleta GraphQL (30-45 minutos)
-python graphQL.py
-```
-
-**Saídas:**
-- `dados/metricas_rest.csv` (990 registros + header)
-- `dados/metricas_graphql.csv` (990 registros + header)
-
-### 10.4 Executar Análise Estatística
-
-```bash
-cd analises
-python analise_estatistica.py
-```
-
-**Saídas:**
-- Relatório estatístico completo em formato texto
-
----
-
-## 11. Validacao dos Dados e Alertas Metodologicos
+## 10. Validacao dos Dados e Alertas Metodologicos
 
 Antes da analise estatistica, o script `analise_estatistica.py` executa validacoes automaticas e gera alertas metodologicos:
 
-### 11.1 Validacoes Executadas
+### 10.1 Validacoes Executadas
 
 1. **Verificacao de valores fixos/constantes** (possivel cache)
    - Calcula Coeficiente de Variacao (CV) dos tamanhos de resposta
@@ -411,7 +358,7 @@ Antes da analise estatistica, o script `analise_estatistica.py` executa validaco
    - Valores extremos sao raros e podem indicar diferencas massivas
    - **Importante:** NAO significa erro, apenas que as diferencas sao muito grandes
 
-### 11.2 Interpretacao dos Alertas
+### 10.2 Interpretacao dos Alertas
 
 **Os alertas NAO sao erros de codigo**, mas sim **indicadores metodologicos** que ajudam a interpretar os resultados:
 
