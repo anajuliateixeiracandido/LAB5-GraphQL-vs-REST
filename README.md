@@ -125,26 +125,6 @@ Para cada execução:
 5. Aplicar delay aleatório
 6. Verificar rate limit
 
-### 7.4 Formato de Saída (CSV)
-
-Todas as métricas são consolidadas em arquivos CSV:
-
-| Coluna | Descrição |
-|--------|-----------|
-| `id_execucao` | ID único da medição (1 a 990) |
-| `usuario` | Usuário GitHub testado |
-| `consulta` | Tipo de Consulta (C1, C2, C3) |
-| `tipo_api` | Tipo de API (REST ou GraphQL) |
-| `tempo_resposta_ms` | Tempo de resposta em milissegundos (Y₁) |
-| `tamanho_resposta_kb` | Tamanho do payload em kilobytes (Y₂) |
-| `status_code` | Código HTTP da resposta |
-| `timestamp` | Data/hora da execução (ISO 8601) |
-| `observacoes` | Registro de anomalias (erros, rate limit, etc.) |
-
-**Arquivos gerados:**
-- `dados/metricas_rest.csv` (990 registros + header)
-- `dados/metricas_graphql.csv` (990 registros + header)
-
 ---
 
 ## 8. Análise de Dados e Critérios Estatísticos
@@ -317,30 +297,11 @@ Este experimento utiliza **design Between-Subjects (inter-sujeitos)** com **grup
 
 ---
 
-### 8.5 Análise Complementar
-
-## 9. Estrutura do Projeto
-
-```
-LAB5-GraphQL-vs-REST/
-├── README.md
-├── scripts/
-│   ├── scriptRest.py
-│   └── graphQL.py
-├── dados/
-│   ├── metricas_rest.csv
-│   └── metricas_graphql.csv
-└── analises/
-    └── analise_estatistica.py
-```
-
----
-
-## 10. Validacao dos Dados e Alertas Metodologicos
+## 9. Validacao dos Dados e Alertas Metodologicos
 
 Antes da analise estatistica, o script `analise_estatistica.py` executa validacoes automaticas e gera alertas metodologicos:
 
-### 10.1 Validacoes Executadas
+### 9.1 Validacoes Executadas
 
 1. **Verificacao de valores fixos/constantes** (possivel cache)
    - Calcula Coeficiente de Variacao (CV) dos tamanhos de resposta
@@ -358,9 +319,7 @@ Antes da analise estatistica, o script `analise_estatistica.py` executa validaco
    - Valores extremos sao raros e podem indicar diferencas massivas
    - **Importante:** NAO significa erro, apenas que as diferencas sao muito grandes
 
-### 10.2 Interpretacao dos Alertas
-
-**Os alertas NAO sao erros de codigo**, mas sim **indicadores metodologicos** que ajudam a interpretar os resultados:
+### 9.2 Interpretacao dos Alertas
 
 | Alerta | O que Significa | E Problema? | Pode Corrigir? |
 |--------|----------------|-------------|----------------|
@@ -369,7 +328,7 @@ Antes da analise estatistica, o script `analise_estatistica.py` executa validaco
 | Cohen's d > 3 (tamanho) | Diferencas massivas entre APIs | NAO - objetivo do GraphQL | NAO - e legitimo |
 | Cohen's d > 3 (tempo) | GraphQL muito mais lento | ATENCAO - contraintuitivo | Investigacao adicional |
 
-**Conclusao:** Os alertas servem para **documentar caracteristicas dos dados**, nao indicam falhas na implementacao. O script esta funcionando corretamente ao identifica-los.
+*Os alertas servem para **documentar caracteristicas dos dados**, nao indicam falhas na implementacao. O script esta funcionando corretamente ao identifica-los.
 
 ---
 
