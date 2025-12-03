@@ -13,14 +13,18 @@ Determinar se a arquitetura GraphQL oferece uma redução significativa no tempo
 ---
 
 ## 2. Hipóteses Estatísticas
+### RQ1: Qual API oferece menor tempo de resposta?
 
-**Hipótese Nula (H₀):** Não há diferença significativa no tempo de resposta e no tamanho da resposta entre consultas realizadas por APIs REST e GraphQL.
+**Hipótese Nula (H₀):** Não há diferença significativa no tempo de resposta entre consultas realizadas por APIs REST e GraphQL. H₀: μ_GraphQL = μ_REST
 
-H₀: μ_GraphQL = μ_REST
+**Hipótese Alternativa (H₁):** Consultas realizadas por APIs GraphQL apresentam tempo de resposta menor do que consultas realizadas por APIs REST. H₁: μ_GraphQL < μ_REST
 
-**Hipótese Alternativa (H₁):** Consultas realizadas por APIs GraphQL apresentam tempo de resposta menor e tamanho de resposta menor do que consultas realizadas por APIs REST.
 
-H₁: μ_GraphQL < μ_REST
+### RQ2: Qual API oferece menor tamanho de resposta?
+
+**Hipótese Nula (H₀):** Não há diferença significativa no tamanho de resposta entre consultas realizadas por APIs REST e GraphQL. H₀: μ_GraphQL = μ_REST
+
+**Hipótese Alternativa (H₁):** Consultas realizadas por APIs GraphQL apresentam tamanho de resposta menor do que consultas realizadas por APIs REST. H₁: μ_GraphQL < μ_REST
 
 ---
 
@@ -182,8 +186,8 @@ Para cada uma das 6 combinações (3 Consultas × 2 Tratamentos) e para cada Var
 
 | Variável | Hipótese Nula (H₀) | Hipótese Alternativa (H₁) |
 |----------|-------------------|---------------------------|
-| Tempo de Resposta (Y₁) | μ_REST = μ_GraphQL | μ_REST > μ_GraphQL (REST é mais lento) |
-| Tamanho de Resposta (Y₂) | μ_REST = μ_GraphQL | μ_REST > μ_GraphQL (REST é maior) |
+| Tempo de Resposta (Y₁) | μ_REST = μ_GraphQL | μ_GraphQL < μ_REST (GraphQL é mais rápida) |
+| Tamanho de Resposta (Y₂) | μ_REST = μ_GraphQL | μ_GraphQL < μ_REST (GraphQL é menor) |
 
 **Critério de Decisão:**
 - Se p-valor ≤ 0,05: **Rejeitar H₀**. Concluir que REST é significativamente maior/mais lento que GraphQL.
@@ -221,6 +225,10 @@ onde σ_pooled = √[(σ²_REST × (n_REST - 1) + σ²_GraphQL × (n_GraphQL - 1
 - 0,5 ≤ |d| < 0,8: efeito grande
 - |d| ≥ 0,8: efeito muito grande
 
+**Interpretação do Sinal:**
+- d negativo (tempo): REST tem média MENOR (mais rápida)
+- d positivo (tamanho): REST tem média MAIOR (payloads maiores)
+
 #### 8.4.2 Intervalo de Confiança (Precisão)
 
 **Cálculo:** IC de 95% para a diferença das médias (μ_REST - μ_GraphQL)
@@ -229,17 +237,7 @@ onde σ_pooled = √[(σ²_REST × (n_REST - 1) + σ²_GraphQL × (n_GraphQL - 1
 - Se o IC **não contiver zero**: a diferença é estatisticamente significativa ao nível de 5%
 - Se o IC **contiver zero**: não há diferença significativa
 
-### 8.5 Tamanho do Efeito
-
-**Medida:** d de Cohen (para amostras independentes)
-
-**Interpretação:**
-- |d| < 0,2: efeito pequeno
-- 0,2 ≤ |d| < 0,5: efeito médio
-- 0,5 ≤ |d| < 0,8: efeito grande
-- |d| ≥ 0,8: efeito muito grande
-
-### 8.6 Análise de Correlação
+### 8.5 Análise de Correlação
 
 **Objetivo:** Investigar a relação entre tempo de resposta (Y₁) e tamanho de resposta (Y₂) dentro de cada API.
 
@@ -263,7 +261,7 @@ onde σ_pooled = √[(σ²_REST × (n_REST - 1) + σ²_GraphQL × (n_GraphQL - 1
 - REST: C1, C2, C3
 - GraphQL: C1, C2, C3
 
-### 8.7 Justificativa do Design Between-Subjects
+### 8.6 Justificativa do Design Between-Subjects
 
 **Por que Between-Subjects e não Within-Subjects?**
 
@@ -328,7 +326,99 @@ Antes da analise estatistica, o script `analise_estatistica.py` executa validaco
 | Cohen's d > 3 (tamanho) | Diferencas massivas entre APIs | NAO - objetivo do GraphQL | NAO - e legitimo |
 | Cohen's d > 3 (tempo) | GraphQL muito mais lento | ATENCAO - contraintuitivo | Investigacao adicional |
 
-*Os alertas servem para **documentar caracteristicas dos dados**, nao indicam falhas na implementacao. O script esta funcionando corretamente ao identifica-los.
+* Os alertas servem para **documentar caracteristicas dos dados**, nao indicam falhas na implementacao. O script esta funcionando corretamente ao identifica-los.
+
+---
+
+## 10. Resultados Observados
+
+### 10.1 Visão Geral
+
+| Métrica       | REST   | GraphQL | Diferença   | Cohen's d | Interpretação                                       |
+|--------------|--------|---------|------------|-----------|-----------------------------------------------------|
+| Tempo (ms)   | 598,57 | 986,27  | -65,3%     | -1,26     | REST significativamente mais rápida — efeito **GRANDE**  |
+| Tamanho (KB) | 25,25  | 7,07    | +67,7%     | +1,10     | GraphQL significativamente menor — efeito **GRANDE**     |
+
+### 10.2 Detalhamento por Tipo de Consulta
+
+#### RQ1: Tempo de Resposta
+
+| Consulta | Tipo       | REST (ms) | GraphQL (ms) | Diferença (ms) | Redução (%) | Interpretação                     |
+|----------|------------|-----------|--------------|----------------|-------------|-----------------------------------|
+| C1       | Simples    | 603,10    | 1.552,58     | -949,48        | -157,7%     | REST **muito** mais rápida        |
+| C2       | Específica | 589,21    | 727,60       | -138,39        | -23,7%      | REST mais rápida                  |
+| C3       | Complexa   | 602,68    | 683,02       | -80,34         | -13,3%      | REST ligeiramente mais rápida     |
+
+**Conclusão RQ1**
+
+- H₁ **rejeitada**: a hipótese de que GraphQL seria mais rápida não foi suportada.
+- Os dados indicam que **REST demonstrou superioridade significativa em velocidade**.
+- Cohen's d = -1,26 (efeito **GRANDE**; sinal negativo indica que REST apresenta tempos menores que GraphQL).
+
+#### RQ2: Tamanho da Resposta
+
+| Consulta | Tipo       | REST (KB) | GraphQL (KB) | Diferença (KB) | Redução (%) | Interpretação                    |
+|----------|------------|-----------|--------------|----------------|-------------|----------------------------------|
+| C1       | Simples    | 53,02     | 7,96         | +45,07         | -85,0%      | GraphQL **muito** menor         |
+| C2       | Específica | 8,81      | 1,03         | +7,77          | -88,3%      | GraphQL **muito** menor         |
+| C3       | Complexa   | 14,06     | 11,81        | +2,25          | -16,0%      | GraphQL ligeiramente menor      |
+
+**Conclusão RQ2**
+
+- H₁ **confirmada**: GraphQL demonstrou **superioridade significativa em eficiência de banda**.
+- Cohen's d = +1,10 (efeito **GRANDE**; sinal positivo indica que REST envia respostas maiores que GraphQL).
+
+
+## 11. Conclusões e Interpretação 
+
+### 11.1 Recomendações Práticas
+**Use REST quando:**
+
+- Latência é crítica (aplicações *real-time*, jogos, trading)
+- Consultas são padronizadas e previsíveis
+- Largura de banda não é um problema (redes corporativas, Wi-Fi)
+- É importante aproveitar cache HTTP (CDN, proxies, etc.)
+
+**Use GraphQL quando:**
+
+- Cenário principal é dado móvel/3G/4G (economia de banda)
+- É necessário permitir consultas customizadas por cliente
+- Over-fetching é um problema real (apps com muitas telas/versões)
+- Flexibilidade é mais importante que velocidade bruta
+
+**Cenário Híbrido (ex.: C3 – Consultas complexas):**
+
+- Diferença de tempo pequena (~-13,3%)
+- Economia de dados moderada (~-16%)
+- GraphQL pode ser viável/atraente para consultas aninhadas e ricas em relacionamento
+
+### 11.2 Conclusão Final
+Com base em **1.980 medições** (990 REST + 990 GraphQL) realizadas na API do GitHub, este experimento demonstrou estatisticamente que:
+
+**RQ1 – Tempo de resposta**
+
+- **REST é significativamente mais rápida** (Cohen's d = -1,26, *p* < 0,001)  
+- Vantagem média de **65,3%** no tempo de resposta geral  
+- Diferença mais pronunciada em **consultas simples** (C1: ~-157,7%)
+
+**RQ2 – Tamanho da resposta**
+
+- **GraphQL é significativamente menor** em tamanho de resposta (Cohen's d = +1,10, *p* < 0,001)  
+- Redução de aproximadamente **72%** no *payload* médio  
+- Economia especialmente expressiva em **consultas específicas** (C2: ~-88,3%)
+
+Em síntese, há um **trade-off claro** entre:
+
+- **Velocidade (latência)** → favorece **REST**
+- **Eficiência de banda (tamanho do payload)** → favorece **GraphQL**
+
+A **escolha arquitetural ideal** depende das restrições e prioridades do projeto:
+
+- Priorize **REST** para aplicações **sensíveis à latência**
+- Priorize **GraphQL** para aplicações **sensíveis ao consumo de dados** e à flexibilidade de consulta
+
+As duas métricas analisadas apresentaram **diferenças estatisticamente significativas**, com **efeitos grandes**, o que reforça a **relevância prática** do trade-off observado entre REST e GraphQL neste contexto experimental.
+
 
 ---
 
