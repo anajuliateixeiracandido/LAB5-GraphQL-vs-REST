@@ -432,17 +432,3 @@ Os alertas **NAO indicam erros de implementacao**, mas sim **caracteristicas met
 6. Avaliar performance com cache habilitado
 
 ---
-
-## 6. Referencias
-
-- GitHub REST API v3: https://docs.github.com/rest
-- GitHub GraphQL API v4: https://docs.github.com/graphql
-- Mann-Whitney U Test: Teste nao-parametrico para amostras independentes
-- Cohen's d: Medida de tamanho de efeito padronizada
-- Shapiro-Wilk: Teste de normalidade
-
----
-
-**Data da Analise:** 28 de novembro de 2025
-**Periodo de Coleta:** 27-28 de novembro de 2025
-**Total de Medicoes Validas:** 1.648 (824 REST + 824 GraphQL)
